@@ -1,5 +1,8 @@
 close all;clear;
 dist_over_time = load('dist_over_time').dist_over_time;
+fly_1_coords_over_time = load('fly_1_coords_over_time').fly_1_coords_over_time;
+fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
+
 
 % ---------------- just checking sg filter ------------------------
 % order = 3;
@@ -16,7 +19,7 @@ dist_over_time = load('dist_over_time').dist_over_time;
 
 
 % --------------- just checking derivative ------------------------
-frame_len_for_sg_filter = 1001;
+frame_len_for_sg_filter = 15;
 smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
 % d_smooth_dist = diff(smooth_dist);
 % figure
@@ -29,7 +32,7 @@ smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
 
 
 % Assuming smooth_dist is already defined
-window_length = 75;
+window_length = 15;
 step_size = 5;
 num_points = length(smooth_dist);
 
@@ -63,8 +66,10 @@ mark_courtship = zeros(length(smooth_dist),1);
 % --- End of raw way ---
 
 % -- Using stats to check if fit is signficant ----
-alpha = 0.3; % significance level
+all_similarities = [];
+alpha = 0.01; % significance level
 for k = 1:num_windows
+    
     % Define start and end indices for the current window
     start_idx = 1 + (k-1)*step_size;
     end_idx = start_idx + window_length - 1;
@@ -103,15 +108,30 @@ for k = 1:num_windows
     if slope_of_fit < 0 && pValue_slope < alpha
         mark_courtship(start_idx:end_idx) = 1;
         windows_with_courtship(k) = 1;
+    else
+        % individual x and y
+        [c1, p_mat_x] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,1) fly_2_coords_over_time(start_idx:end_idx,1) fly_1_coords_over_time(start_idx:end_idx,1)+fly_2_coords_over_time(start_idx:end_idx,1)]); 
+        [c2, p_mat_y] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,2) fly_2_coords_over_time(start_idx:end_idx,2) fly_1_coords_over_time(start_idx:end_idx,2)+fly_2_coords_over_time(start_idx:end_idx,2)]);
+        p1 = p_mat_x(1,2);
+        p2 = p_mat_y(1,2);
+
+        if p1 < alpha && p2 < alpha
+            mark_courtship(start_idx:end_idx) = 1;
+            windows_with_courtship(k) = 1;
+        end
+
+        
+        
     end
 end
+
 disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ' for sg filter len ' num2str(frame_len_for_sg_filter)])
 % Now, 'slopes' contains the slope of the line fit to each window
 
 figure;
 plot(smooth_dist, '-');    % Plot the smooth line
 hold on;                   % Hold the plot to overlay the next elements
-indices = find(mark_courtship == 1);       % Find the indices where mark_courtship is 1
+indices = find(mark_courtship == 0);       % Find the indices where mark_courtship is 1
 plot(indices, smooth_dist(indices), '*');  % Mark '*' at those points
 xlabel('X-axis label');
 ylabel('Y-axis label');

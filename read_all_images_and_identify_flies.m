@@ -36,7 +36,7 @@ circlePixels = (rowsInImage - y_center).^2 + (columnsInImage - x_center).^2 <= r
 mask = uint8(circlePixels);
 
 % iterate through all png files in "all_frames" folder
-
+counter = 1;
 for file = files'
 
     disp(['Processing file ' file.name])
@@ -109,9 +109,26 @@ for file = files'
         fly_coords(1,:) = stats(fly_indices(1)).Centroid;
         fly_coords(2,:) = stats(fly_indices(2)).Centroid;
 
-        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
-        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
-
+        % assumption that, first 2 frames are correct.
+        
+        if counter > 2
+            new1_prev_1_vec = fly_coords(1,:) - fly_1_coords_over_time(counter-1,:);
+            new2_prev_1_vec = fly_coords(2,:) - fly_1_coords_over_time(counter-1,:);
+            
+            old1_vec = fly_1_coords_over_time(counter-1,:) - fly_2_coords_over_time(counter-2,:);
+            
+            if dot(new1_prev_1_vec, old1_vec) > dot(new2_prev_1_vec, old1_vec)
+                fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
+                fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
+            else
+                fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(2,:)];
+                fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(1,:)];
+            end
+        else
+            fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
+            fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
+        end
+        
         dist = pdist(fly_coords);
        
         dist_over_time = [dist_over_time dist];
@@ -122,25 +139,34 @@ for file = files'
             fly_2_coords_over_time = [fly_2_coords_over_time; stats(fly_indices(1)).Centroid];
     else
         all_fly_coords = zeros(length(fly_indices), 2);
+        dot_with_old1 = zeros(length(fly_indices), 1);
+        dot_with_old2 = zeros(length(fly_indices), 1);
+
+        old1_vec = fly_1_coords_over_time(counter-1,:) - fly_2_coords_over_time(counter-2,:);
+        old2_vec = fly_2_coords_over_time(counter-1,:) - fly_2_coords_over_time(counter-2,:);
+
         for f = 1:length(fly_indices)
             all_fly_coords(f,:) = stats(fly_indices(f)).Centroid;
-        end
-
-       all_possible_dist = [];
-       all_possible_pairs = [];
-       for f1 = 1:length(all_fly_coords)-1
-           for f2 = f1+1:length(all_fly_coords)
-               all_possible_dist = [all_possible_dist pdist([all_fly_coords(f1,:); all_fly_coords(f2,:)])];
-                all_possible_pairs = [all_possible_pairs; [f1 f2]];
+            if counter > 2
+                dot_with_old1(f) = dot(old1_vec, all_fly_coords(f,:) - fly_1_coords_over_time(counter-1,:));
+                dot_with_old2(f) = dot(old2_vec, all_fly_coords(f,:) - fly_2_coords_over_time(counter-1,:));
             end
         end
 
-        [max_dist_val, max_dist_ind] = max(all_possible_dist);
-        fly_1_coords_over_time = [fly_1_coords_over_time; all_fly_coords(all_possible_pairs(max_dist_ind,1),:)];
-        fly_2_coords_over_time = [fly_2_coords_over_time; all_fly_coords(all_possible_pairs(max_dist_ind,2),:)];
-        dist_over_time = [dist_over_time max_dist_val];
+       [max_dot1_val, max_dot1_ind] = max(dot_with_old1);
+        [max_dot2_val, max_dot2_ind] = max(dot_with_old2);
 
+        fly_1_coords_over_time = [fly_1_coords_over_time; all_fly_coords(max_dot1_ind,:)];
+        fly_2_coords_over_time = [fly_2_coords_over_time; all_fly_coords(max_dot2_ind,:)];
+
+        dist_over_time = [dist_over_time pdist([all_fly_coords(max_dot1_ind,:); all_fly_coords(max_dot2_ind,:)])];
+       
+        
+
+        
     end % if
+
+    counter = counter + 1;
     
 end % file
 
