@@ -23,6 +23,9 @@ fly_min_area_percent = 0.01;
 fly_max_area_percet = 2;
 thresold_for_fly_color = 80;
 dist_over_time = [];
+fly_1_coords_over_time = [];
+fly_2_coords_over_time = [];
+
 num_of_flies_over_time = [];
 files = dir('all_frames/*.png');
 img = imread(strcat('all_frames/', files(1).name));
@@ -106,12 +109,17 @@ for file = files'
         fly_coords(1,:) = stats(fly_indices(1)).Centroid;
         fly_coords(2,:) = stats(fly_indices(2)).Centroid;
 
+        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
+        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
+
         dist = pdist(fly_coords);
        
         dist_over_time = [dist_over_time dist];
 
     elseif length(fly_indices) == 1
             dist_over_time = [dist_over_time 0];
+            fly_1_coords_over_time = [fly_1_coords_over_time; stats(fly_indices(1)).Centroid];
+            fly_2_coords_over_time = [fly_2_coords_over_time; stats(fly_indices(1)).Centroid];
     else
         all_fly_coords = zeros(length(fly_indices), 2);
         for f = 1:length(fly_indices)
@@ -119,19 +127,47 @@ for file = files'
         end
 
        all_possible_dist = [];
+       all_possible_pairs = [];
        for f1 = 1:length(all_fly_coords)-1
            for f2 = f1+1:length(all_fly_coords)
                all_possible_dist = [all_possible_dist pdist([all_fly_coords(f1,:); all_fly_coords(f2,:)])];
-           end
+                all_possible_pairs = [all_possible_pairs; [f1 f2]];
+            end
         end
 
-        dist_over_time = [dist_over_time max(all_possible_dist)];
+        [max_dist_val, max_dist_ind] = max(all_possible_dist);
+        fly_1_coords_over_time = [fly_1_coords_over_time; all_fly_coords(all_possible_pairs(max_dist_ind,1),:)];
+        fly_2_coords_over_time = [fly_2_coords_over_time; all_fly_coords(all_possible_pairs(max_dist_ind,2),:)];
+        dist_over_time = [dist_over_time max_dist_val];
 
     end % if
     
 end % file
 
 
+frames_to_see_for_coords = 1:15;
+
+figure
+
+subplot(1,2,1)
+% Plot the paths
+plot(fly_1_coords_over_time(frames_to_see_for_coords,1), fly_1_coords_over_time(frames_to_see_for_coords,2))
+hold on
+    plot(fly_2_coords_over_time(frames_to_see_for_coords,1), fly_2_coords_over_time(frames_to_see_for_coords,2));
+
+    % Plot the starting points of fly 1 and fly 2
+    plot(fly_1_coords_over_time(frames_to_see_for_coords(1),1), fly_1_coords_over_time(frames_to_see_for_coords(1),2), 'ro', 'MarkerSize', 10, 'DisplayName', 'Fly 1 Start');
+    plot(fly_2_coords_over_time(frames_to_see_for_coords(1),1), fly_2_coords_over_time(frames_to_see_for_coords(1),2), 'bo', 'MarkerSize', 10, 'DisplayName', 'Fly 2 Start');
+hold off
+title('Coordinates of flies over time')
+
+subplot(1,2,2)
+plot(dist_over_time(frames_to_see_for_coords))
+title('dist over time')
+
+save('dist_over_time.mat', 'dist_over_time')
+save('fly_1_coords_over_time.mat', 'fly_1_coords_over_time')
+save('fly_2_coords_over_time.mat', 'fly_2_coords_over_time')
 
 
 
