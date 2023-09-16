@@ -3,6 +3,8 @@ dist_over_time = load('dist_over_time').dist_over_time;
 fly_1_coords_over_time = load('fly_1_coords_over_time').fly_1_coords_over_time;
 fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
 
+is_intersecting_over_time = load('is_intersecting_over_time').is_intersecting_over_time;
+cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
 
 % ---------------- just checking sg filter ------------------------
 % order = 3;
@@ -21,6 +23,7 @@ fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
 % --------------- just checking derivative ------------------------
 frame_len_for_sg_filter = 15;
 smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
+% smooth_dist = dist_over_time;
 % d_smooth_dist = diff(smooth_dist);
 % figure
 %     plot(smooth_dist, 'b', 'LineWidth', 2)
@@ -32,8 +35,9 @@ smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
 
 
 % Assuming smooth_dist is already defined
-window_length = 15;
-step_size = 5;
+% This comes from read_all_images_and_identify_flies.m
+window_length = load('frames_to_see').frames_to_see;
+step_size = window_length;
 num_points = length(smooth_dist);
 
 % Determine the number of windows
@@ -45,6 +49,9 @@ alphas = zeros(1, num_windows);
 windows_with_courtship = zeros(1, num_windows);
 
 mark_courtship = zeros(length(smooth_dist),1);
+mark_courtship_dec_distance = zeros(length(smooth_dist),1);
+mark_courtship_non_dec_distance = zeros(length(smooth_dist),1);
+
 % -- Raw way, just checking the slope of line fit to each window --
 % for k = 1:num_windows
 %     % Define start and end indices for the current window
@@ -106,19 +113,31 @@ for k = 1:num_windows
     alphas(k) = pValue_slope;
     % Compare p-value to significance level
     if slope_of_fit < 0 && pValue_slope < alpha
+    % if slope_of_fit < 0 % loosen the distance decrease condition
         mark_courtship(start_idx:end_idx) = 1;
         windows_with_courtship(k) = 1;
-    else
-        % individual x and y
-        [c1, p_mat_x] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,1) fly_2_coords_over_time(start_idx:end_idx,1) fly_1_coords_over_time(start_idx:end_idx,1)+fly_2_coords_over_time(start_idx:end_idx,1)]); 
-        [c2, p_mat_y] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,2) fly_2_coords_over_time(start_idx:end_idx,2) fly_1_coords_over_time(start_idx:end_idx,2)+fly_2_coords_over_time(start_idx:end_idx,2)]);
-        p1 = p_mat_x(1,2);
-        p2 = p_mat_y(1,2);
+        mark_courtship_dec_distance(start_idx:end_idx) = 1;
+    else 
+    % elseif slope_of_fit > 0 && pValue_slope < alpha % NOT a good idea
 
-        if p1 < alpha && p2 < alpha
+        if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
             mark_courtship(start_idx:end_idx) = 1;
             windows_with_courtship(k) = 1;
+            mark_courtship_non_dec_distance(start_idx:end_idx) = 1;
         end
+
+        % ----------- Correlation is NOT a good idea -----
+        % individual x and y
+        % [c1, p_mat_x] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,1) fly_2_coords_over_time(start_idx:end_idx,1) fly_1_coords_over_time(start_idx:end_idx,1)+fly_2_coords_over_time(start_idx:end_idx,1)]); 
+        % [c2, p_mat_y] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,2) fly_2_coords_over_time(start_idx:end_idx,2) fly_1_coords_over_time(start_idx:end_idx,2)+fly_2_coords_over_time(start_idx:end_idx,2)]);
+        % p1 = p_mat_x(1,2);
+        % p2 = p_mat_y(1,2);
+
+        % if p1 < alpha && p2 < alpha
+        %     mark_courtship(start_idx:end_idx) = 1;
+        %     windows_with_courtship(k) = 1;
+        %     mark_courtship_non_dec_distance(start_idx:end_idx) = 1;
+        % end
 
         
         
@@ -139,3 +158,6 @@ title('Smooth Dist with Courtship Marks');
 legend('Smooth Dist', 'Courtship Marks');
 
 save('mark_courtship', 'mark_courtship')
+save('mark_courtship_dec_distance', 'mark_courtship_dec_distance')
+save('mark_courtship_non_dec_distance', 'mark_courtship_non_dec_distance')
+save('windows_with_courtship', 'windows_with_courtship')
