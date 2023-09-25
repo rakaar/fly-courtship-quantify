@@ -15,10 +15,17 @@ clc;close all;clear;
 % x2 = 310;
 % y2 = 179;
 
-x1 = 9;
-y1 = 161;
-x2 = 281;
-y2 = 161;
+% sample c
+% x1 = 9;
+% y1 = 161;
+% x2 = 281;
+% y2 = 161;
+
+% sample_b
+x1 = 47; y1 = 160; x2 = 316; y2 = 160;
+
+% SAMPLE
+% x1 = 6; y1 = 149; x2 = 280; y2 = 149;
 % Define the coordinates of the circle's center
 x_center = (x1 + x2) / 2;
 y_center = (y1 + y2) / 2;
@@ -44,12 +51,13 @@ fly_2_coords_over_time = [];
 cos_theta_over_time = [];
 is_intersecting_over_time = [];
 
-frames_to_see = 15;
+frames_to_see = 3;
 
 num_of_flies_over_time = [];
 files = dir('all_frames/*.png');
 img = imread(strcat('all_frames/', files(1).name));
 
+frame_zero_counter = 0;
 % Now make a mask out of cirle, basically ones inside circle, zeros outside circle
 [columnsInImage, rowsInImage] = meshgrid(1:size(img, 2), 1:size(img, 1));
 circlePixels = (rowsInImage - y_center).^2 + (columnsInImage - x_center).^2 <= radius.^2;
@@ -182,9 +190,13 @@ for file = files'
         dist_over_time = [dist_over_time pdist([all_fly_coords(max_dot1_ind,:); all_fly_coords(max_dot2_ind,:)])];
        
     else
-        error(['No FLIES detected ' file.name ])    
+        % error(['No FLIES detected ' file.name ]) 
+        frame_zero_counter = frame_zero_counter + 1;   
+        disp('++++++++++++++++00000000000000000000000000000++++++++++++++++++++===')
+        fly_1_coords_over_time = [fly_1_coords_over_time; fly_1_coords_over_time(end,:)];
+        fly_2_coords_over_time = [fly_2_coords_over_time; fly_2_coords_over_time(end,:)];
+        dist_over_time = [dist_over_time dist_over_time(end)];
 
-        
     end % if
 
     counter = counter + 1;
@@ -195,21 +207,19 @@ end % file
 % calculate intersection of 2 vectors and angle between them
 disp('#################### Calculating angle between 2 vectors and intersection of 2 vectors ####################')
 counter = 0;
-for file = files'
+for f = 1:3:length(files')-3
+    file = files(f);
+
    
-
-    if mod(counter, frames_to_see) == 0 && counter + frames_to_see <= length(files)
-
         disp(['Processing file ' file.name ' Counter = ' num2str(counter)])
-        
         
             % vectors
             % Calculate the dx and dy for both flies
-            dx1 = fly_1_coords_over_time(counter+frames_to_see,1) - fly_1_coords_over_time(counter+1,1);
-            dy1 = fly_1_coords_over_time(counter+frames_to_see,2) - fly_1_coords_over_time(counter+1,2);
+            dx1 = fly_1_coords_over_time(f+frames_to_see-1,1) - fly_1_coords_over_time(f,1);
+            dy1 = fly_1_coords_over_time(f+frames_to_see-1,2) - fly_1_coords_over_time(f,2);
 
-            dx2 = fly_2_coords_over_time(counter+frames_to_see,1) - fly_2_coords_over_time(counter+1,1);
-            dy2 = fly_2_coords_over_time(counter+frames_to_see,2) - fly_2_coords_over_time(counter+1,2);
+            dx2 = fly_2_coords_over_time(f+frames_to_see-1,1) - fly_2_coords_over_time(f,1);
+            dy2 = fly_2_coords_over_time(f+frames_to_see-1,2) - fly_2_coords_over_time(f,2);
 
             
             % -----------1. Angle between them is acute,  dot product is positive
@@ -225,8 +235,8 @@ for file = files'
 
             % -------------2. Intersection of 2 vectors ----------------------
             % Define the vectors and points
-            P1 = [fly_1_coords_over_time(counter+1,1), fly_1_coords_over_time(counter+1,2)];
-            P2 = [fly_2_coords_over_time(counter+1,1), fly_2_coords_over_time(counter+1,2)];
+            P1 = [fly_1_coords_over_time(f+frames_to_see-1,1), fly_1_coords_over_time(f,2)];
+            P2 = [fly_2_coords_over_time(f+frames_to_see-1,1), fly_2_coords_over_time(f,2)];
 
             v1 = [dx1, dy1];
             v2 = [dx2, dy2];
@@ -254,11 +264,6 @@ for file = files'
             cos_theta_over_time = [cos_theta_over_time cosTheta];
             is_intersecting_over_time = [is_intersecting_over_time is_intersecting];
          
-        
-    end
-    counter = counter + 1; % if one by one
-    
-    
 end
 
 % ----- A figure to just visualize

@@ -37,20 +37,15 @@ smooth_dist = dist_over_time;
 % Assuming smooth_dist is already defined
 % This comes from read_all_images_and_identify_flies.m
 window_length = load('frames_to_see').frames_to_see;
-step_size = window_length;
+step_size = 3;
 num_points = length(smooth_dist);
 
 % Determine the number of windows
 num_windows = floor((num_points - window_length) / step_size) + 1;
 
-% Initialize a vector to store slopes
-slopes = zeros(1, num_windows);
-alphas = zeros(1, num_windows);
-windows_with_courtship = zeros(1, num_windows);
 
 mark_courtship = zeros(length(smooth_dist),1);
-mark_courtship_dec_distance = zeros(length(smooth_dist),1);
-mark_courtship_non_dec_distance = zeros(length(smooth_dist),1);
+mark_courtship_zero_dist_max = zeros(length(smooth_dist),1);
 
 % -- Raw way, just checking the slope of line fit to each window --
 % for k = 1:num_windows
@@ -81,67 +76,13 @@ for k = 1:num_windows
     start_idx = 1 + (k-1)*step_size;
     end_idx = start_idx + window_length - 1;
 
-    % Extract data for the current window
-    window_data = smooth_dist(start_idx:end_idx);
-
-    x = 1:length(window_data); 
-    y = window_data;
-
-    X = [ones(length(x), 1) x'];
-    
-    % Compute the coefficients (beta)
-    beta = (X' * X) \ X' * y';
-    slope_of_fit = beta(2);
-
-    % Compute residuals
-    y_fit = X * beta;
-    residuals = y - y_fit';
-    
-    % Compute standard error of the residuals
-    stderr_residuals = std(residuals);
-
-   % Compute standard error of the slope
-    stderr_slope = stderr_residuals / sqrt(sum((x - mean(x)).^2));
-
-    % Compute t-statistic for the slope
-    t_slope = beta(2) / stderr_slope;
-
-    % Compute p-value for the t-statistic
-    df = length(x) - 2; % degrees of freedom
-    pValue_slope = 2 * (1 - tcdf(abs(t_slope), df));
-
-    alphas(k) = pValue_slope;
-    % Compare p-value to significance level
-    if slope_of_fit < 0 && pValue_slope < alpha || sum(dist_over_time(start_idx:end_idx) < 50) >= round(window_length/2) 
-    % if slope_of_fit < 0 % loosen the distance decrease condition
+    if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
         mark_courtship(start_idx:end_idx) = 1;
-        windows_with_courtship(k) = 1;
-        mark_courtship_dec_distance(start_idx:end_idx) = 1;
-    else 
-    % elseif slope_of_fit > 0 && pValue_slope < alpha % NOT a good idea
-
-        if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
-            mark_courtship(start_idx:end_idx) = 1;
-            windows_with_courtship(k) = 1;
-            mark_courtship_non_dec_distance(start_idx:end_idx) = 1;
-        end
-
-        % ----------- Correlation is NOT a good idea -----
-        % individual x and y
-        % [c1, p_mat_x] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,1) fly_2_coords_over_time(start_idx:end_idx,1) fly_1_coords_over_time(start_idx:end_idx,1)+fly_2_coords_over_time(start_idx:end_idx,1)]); 
-        % [c2, p_mat_y] = corrcoef([fly_1_coords_over_time(start_idx:end_idx,2) fly_2_coords_over_time(start_idx:end_idx,2) fly_1_coords_over_time(start_idx:end_idx,2)+fly_2_coords_over_time(start_idx:end_idx,2)]);
-        % p1 = p_mat_x(1,2);
-        % p2 = p_mat_y(1,2);
-
-        % if p1 < alpha && p2 < alpha
-        %     mark_courtship(start_idx:end_idx) = 1;
-        %     windows_with_courtship(k) = 1;
-        %     mark_courtship_non_dec_distance(start_idx:end_idx) = 1;
-        % end
-
-        
-        
+    elseif sum(dist_over_time(start_idx:end_idx) < 50) >= round(window_length/2) 
+        mark_courtship(start_idx:end_idx) = 1;
+        mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
     end
+
 end
 
 disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ' for sg filter len ' num2str(frame_len_for_sg_filter)])
@@ -158,6 +99,4 @@ title('Smooth Dist with Courtship Marks');
 legend('Smooth Dist', 'Courtship Marks');
 
 save('mark_courtship', 'mark_courtship')
-save('mark_courtship_dec_distance', 'mark_courtship_dec_distance')
-save('mark_courtship_non_dec_distance', 'mark_courtship_non_dec_distance')
-save('windows_with_courtship', 'windows_with_courtship')
+save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max')
