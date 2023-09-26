@@ -15,17 +15,14 @@ clc;close all;clear;
 % x2 = 310;
 % y2 = 179;
 
+% SAMPLE D
+% x1 = 5; y1 = 161; x2 = 281; y2 = 161;
 % sample c
-% x1 = 9;
-% y1 = 161;
-% x2 = 281;
-% y2 = 161;
+x1 = 13; y1 = 182; x2 = 288; y2 = 182;
 
 % sample_b
-x1 = 47; y1 = 160; x2 = 316; y2 = 160;
+% x1 = 37; y1 = 185; x2 = 316; y2 = 185;
 
-% SAMPLE
-% x1 = 6; y1 = 149; x2 = 280; y2 = 149;
 % Define the coordinates of the circle's center
 x_center = (x1 + x2) / 2;
 y_center = (y1 + y2) / 2;
@@ -51,7 +48,8 @@ fly_2_coords_over_time = [];
 cos_theta_over_time = [];
 is_intersecting_over_time = [];
 
-frames_to_see = 3;
+% Load all params - step size and window size
+all_params;
 
 num_of_flies_over_time = [];
 files = dir('all_frames/*.png');
@@ -190,7 +188,7 @@ for file = files'
         dist_over_time = [dist_over_time pdist([all_fly_coords(max_dot1_ind,:); all_fly_coords(max_dot2_ind,:)])];
        
     else
-        % error(['No FLIES detected ' file.name ]) 
+        error(['No FLIES detected ' file.name ]) 
         frame_zero_counter = frame_zero_counter + 1;   
         disp('++++++++++++++++00000000000000000000000000000++++++++++++++++++++===')
         fly_1_coords_over_time = [fly_1_coords_over_time; fly_1_coords_over_time(end,:)];
@@ -207,7 +205,7 @@ end % file
 % calculate intersection of 2 vectors and angle between them
 disp('#################### Calculating angle between 2 vectors and intersection of 2 vectors ####################')
 counter = 0;
-for f = 1:3:length(files')-3
+for f = 1:step_size:length(files')-frames_to_see
     file = files(f);
 
    

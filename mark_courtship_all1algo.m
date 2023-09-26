@@ -21,7 +21,7 @@ cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
 
 
 % --------------- just checking derivative ------------------------
-frame_len_for_sg_filter = 15;
+% frame_len_for_sg_filter = 15;
 % smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
 smooth_dist = dist_over_time;
 % d_smooth_dist = diff(smooth_dist);
@@ -36,12 +36,16 @@ smooth_dist = dist_over_time;
 
 % Assuming smooth_dist is already defined
 % This comes from read_all_images_and_identify_flies.m
-window_length = load('frames_to_see').frames_to_see;
-step_size = 3;
+% Run all_params to get "frames_to_see" and "step_size"
+all_params;
+window_length = frames_to_see;
+
 num_points = length(smooth_dist);
 
 % Determine the number of windows
-num_windows = floor((num_points - window_length) / step_size) + 1;
+% num_windows = floor((num_points - window_length) / step_size) + 1;
+num_windows = floor((num_points - window_length) / step_size);
+
 
 
 mark_courtship = zeros(length(smooth_dist),1);
@@ -85,7 +89,7 @@ for k = 1:num_windows
 
 end
 
-disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ' for sg filter len ' num2str(frame_len_for_sg_filter)])
+disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ])
 % Now, 'slopes' contains the slope of the line fit to each window
 
 figure;
