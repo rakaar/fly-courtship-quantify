@@ -6,7 +6,7 @@ fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
 is_intersecting_over_time = load('is_intersecting_over_time').is_intersecting_over_time;
 cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
 
-
+files = dir('all_frames/*.png');
 
 % --------------- just checking derivative ------------------------
 smooth_dist = dist_over_time;
@@ -25,15 +25,34 @@ num_windows = floor((num_points - window_length) / step_size) + 1;
 mark_courtship = zeros(length(smooth_dist),1);
 mark_courtship_zero_dist_max = zeros(length(smooth_dist),1);
 
+% temp - 
+all_no_cos_theta = [];
 % -- Using stats to check if fit is signficant ----
 all_similarities = [];
 thresold_pixel_distance = 50;
 alpha = 0.01; % significance level
-for k = 1:num_windows
+% for k = 1:num_windows
     
-    % Define start and end indices for the current window
-    start_idx = 1 + (k-1)*step_size;
+%     % Define start and end indices for the current window
+%     start_idx = 1 + (k-1)*step_size;
+%     end_idx = start_idx + window_length - 1;
+
+%     if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
+%         mark_courtship(start_idx:end_idx) = 1;
+%     elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) == round(window_length) 
+%     % elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) >= round(window_length/2) 
+
+%         mark_courtship(start_idx:end_idx) = 1;
+%         mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
+    
+%     else % temp
+%         all_no_cos_theta = [all_no_cos_theta; cos_theta_over_time(k)*is_intersecting_over_time(k)];
+%     end
+% end
+k = 0;
+for start_idx = 1:step_size:length(files')-window_length
     end_idx = start_idx + window_length - 1;
+    k = k + 1;
 
     if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
         mark_courtship(start_idx:end_idx) = 1;
@@ -42,6 +61,8 @@ for k = 1:num_windows
 
         mark_courtship(start_idx:end_idx) = 1;
         mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
+    else % temp
+        all_no_cos_theta = [all_no_cos_theta; cos_theta_over_time(k)*is_intersecting_over_time(k)];
     end
 
 end
@@ -49,11 +70,10 @@ end
 % less than threshold pixels for 15 seconds, then remove courtship
 window_length = window_limit_for_dist_condition; % 15/10 seconds, each second is 5 frames
 num_windows = floor((num_points - window_length) / step_size) + 1;
-for k = 1:num_windows
-    
-    % Define start and end indices for the current window
-    start_idx = 1 + (k-1)*step_size;
+k = 0;
+for start_idx = 1:step_size:length(files')-window_length
     end_idx = start_idx + window_length - 1;
+    k = k + 1;
 
     if sum(mark_courtship_zero_dist_max(start_idx:end_idx)) == window_length
         % disp(['k for testin ' num2str(k)])
@@ -68,6 +88,8 @@ for k = 1:num_windows
     end
 
 end
+
+
 
 disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ])
 

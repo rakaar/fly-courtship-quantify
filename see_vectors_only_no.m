@@ -16,7 +16,7 @@ window_num = 0;
 % Comment this when not Visualizing any particular type of windows
 windows_with_courtship = load('mark_courtship').mark_courtship;
 mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
-
+temp_cos_theta = [];
 for f = 1:step_size:length(files')-frames_to_see
     
     window_num = window_num + 1;
@@ -104,6 +104,7 @@ for f = 1:step_size:length(files')-frames_to_see
             end
 
 
+            temp_cos_theta = [temp_cos_theta; cosTheta.*is_intersecting];
             % --- Check both above conditions---
 
             % Highlight the first point for each fly
