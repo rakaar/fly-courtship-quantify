@@ -6,36 +6,11 @@ fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
 is_intersecting_over_time = load('is_intersecting_over_time').is_intersecting_over_time;
 cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
 
-% ---------------- just checking sg filter ------------------------
-% order = 3;
-% frame_len = 11;
-% sg_dist_over_time = sgolayfilt(dist_over_time,order,frame_len);
-
-% figure
-%     plot(dist_over_time, 'b', 'LineWidth', 2)
-%     hold on
-%     plot(sgolayfilt(dist_over_time,3,11), 'LineWidth', 2)
-%     plot(sgolayfilt(dist_over_time,3,15), 'LineWidth', 2)
-%     hold off
-%     % legend('Original Signal','Filtered Signal')
 
 
 % --------------- just checking derivative ------------------------
-% frame_len_for_sg_filter = 15;
-% smooth_dist = sgolayfilt(dist_over_time,3,frame_len_for_sg_filter);
 smooth_dist = dist_over_time;
-% d_smooth_dist = diff(smooth_dist);
-% figure
-%     plot(smooth_dist, 'b', 'LineWidth', 2)
-%     hold on
-%     plot(d_smooth_dist, 'r', 'LineWidth', 2)
-%     hold off
-%     legend('Smoothed Signal','Derivative of Smoothed Signal')
-%     title('Just see derivative')
 
-
-% Assuming smooth_dist is already defined
-% This comes from read_all_images_and_identify_flies.m
 % Run all_params to get "frames_to_see" and "step_size"
 all_params;
 window_length = frames_to_see;
@@ -43,36 +18,16 @@ window_length = frames_to_see;
 num_points = length(smooth_dist);
 
 % Determine the number of windows
-% num_windows = floor((num_points - window_length) / step_size) + 1;
-num_windows = floor((num_points - window_length) / step_size);
+num_windows = floor((num_points - window_length) / step_size) + 1;
 
 
 
 mark_courtship = zeros(length(smooth_dist),1);
 mark_courtship_zero_dist_max = zeros(length(smooth_dist),1);
 
-% -- Raw way, just checking the slope of line fit to each window --
-% for k = 1:num_windows
-%     % Define start and end indices for the current window
-%     start_idx = 1 + (k-1)*step_size;
-%     end_idx = start_idx + window_length - 1;
-
-%     % Extract data for the current window
-%     window_data = smooth_dist(start_idx:end_idx);
-
-%     % Fit a line (1st order polynomial) to the window data
-%     [p,~] = polyfit(1:length(window_data), window_data, 1);
-    
-%     % The slope of the line is the first coefficient
-%     slopes(k) = p(1);
-%     if p(1) < 0 
-%         mark_courtship(start_idx:end_idx) = 1;
-%     end
-% end
-% --- End of raw way ---
-
 % -- Using stats to check if fit is signficant ----
 all_similarities = [];
+thresold_pixel_distance = 50;
 alpha = 0.01; % significance level
 for k = 1:num_windows
     
@@ -82,15 +37,39 @@ for k = 1:num_windows
 
     if cos_theta_over_time(k) > 0 && is_intersecting_over_time(k) == 1
         mark_courtship(start_idx:end_idx) = 1;
-    elseif sum(dist_over_time(start_idx:end_idx) < 50) >= round(window_length/2) 
+    elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) == round(window_length) 
+    % elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) >= round(window_length/2) 
+
         mark_courtship(start_idx:end_idx) = 1;
         mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
     end
 
 end
 
+% less than threshold pixels for 15 seconds, then remove courtship
+window_length = window_limit_for_dist_condition; % 15/10 seconds, each second is 5 frames
+num_windows = floor((num_points - window_length) / step_size) + 1;
+for k = 1:num_windows
+    
+    % Define start and end indices for the current window
+    start_idx = 1 + (k-1)*step_size;
+    end_idx = start_idx + window_length - 1;
+
+    if sum(mark_courtship_zero_dist_max(start_idx:end_idx)) == window_length
+        % disp(['k for testin ' num2str(k)])
+        fly_1_dx = diff(fly_1_coords_over_time(start_idx:end_idx,1));
+        fly_2_dx = diff(fly_2_coords_over_time(start_idx:end_idx,1));
+
+        if sum(fly_1_dx < 1) == length(fly_1_dx) && sum(fly_2_dx < 1) == length(fly_2_dx)
+            disp('))))))))))))))))) REMOVED COURTSHIP ((((((((((((((((((()))))))))))))))))))')
+            mark_courtship(start_idx:end_idx) = 0;
+            mark_courtship_zero_dist_max(start_idx:end_idx) = 0;
+        end
+    end
+
+end
+
 disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ])
-% Now, 'slopes' contains the slope of the line fit to each window
 
 figure;
 plot(smooth_dist, '-');    % Plot the smooth line

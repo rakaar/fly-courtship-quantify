@@ -18,10 +18,10 @@ clc;close all;clear;
 % SAMPLE D
 % x1 = 5; y1 = 161; x2 = 281; y2 = 161;
 % sample c
-x1 = 13; y1 = 182; x2 = 288; y2 = 182;
+% x1 = 13; y1 = 182; x2 = 288; y2 = 182;
 
 % sample_b
-% x1 = 37; y1 = 185; x2 = 316; y2 = 185;
+x1 = 37; y1 = 185; x2 = 316; y2 = 185;
 
 % Define the coordinates of the circle's center
 x_center = (x1 + x2) / 2;
@@ -204,12 +204,11 @@ end % file
 
 % calculate intersection of 2 vectors and angle between them
 disp('#################### Calculating angle between 2 vectors and intersection of 2 vectors ####################')
-counter = 0;
 for f = 1:step_size:length(files')-frames_to_see
     file = files(f);
 
    
-        disp(['Processing file ' file.name ' Counter = ' num2str(counter)])
+        disp(['For angle btn flies: Processing file ' file.name ])
         
             % vectors
             % Calculate the dx and dy for both flies
