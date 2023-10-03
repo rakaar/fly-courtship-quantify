@@ -16,12 +16,12 @@ clc;close all;clear;
 % y2 = 179;
 
 % SAMPLE D
-% x1 = 5; y1 = 161; x2 = 281; y2 = 161;
+x1 = 5; y1 = 161; x2 = 281; y2 = 161;
 % sample c
 % x1 = 13; y1 = 182; x2 = 288; y2 = 182;
 
 % sample_b
-x1 = 37; y1 = 185; x2 = 316; y2 = 185;
+% x1 = 37; y1 = 185; x2 = 316; y2 = 185;
 
 % Define the coordinates of the circle's center
 x_center = (x1 + x2) / 2;
@@ -201,67 +201,6 @@ for file = files'
     
 end % file
 
-
-% calculate intersection of 2 vectors and angle between them
-disp('#################### Calculating angle between 2 vectors and intersection of 2 vectors ####################')
-for f = 1:step_size:length(files')-frames_to_see
-    file = files(f);
-
-   
-        disp(['For angle btn flies: Processing file ' file.name ])
-        
-            % vectors
-            % Calculate the dx and dy for both flies
-            dx1 = fly_1_coords_over_time(f+frames_to_see-1,1) - fly_1_coords_over_time(f,1);
-            dy1 = fly_1_coords_over_time(f+frames_to_see-1,2) - fly_1_coords_over_time(f,2);
-
-            dx2 = fly_2_coords_over_time(f+frames_to_see-1,1) - fly_2_coords_over_time(f,1);
-            dy2 = fly_2_coords_over_time(f+frames_to_see-1,2) - fly_2_coords_over_time(f,2);
-
-            
-            % -----------1. Angle between them is acute,  dot product is positive
-            % Calculate dot product
-            dotProduct = dx1 * dx2 + dy1 * dy2;
-
-            % Calculate magnitudes
-            mag1 = sqrt(dx1^2 + dy1^2);
-            mag2 = sqrt(dx2^2 + dy2^2);
-
-            % Find cosine of angle
-            cosTheta = dotProduct / (mag1 * mag2); % positive for acute, negative for obtuse
-
-            % -------------2. Intersection of 2 vectors ----------------------
-            % Define the vectors and points
-            P1 = [fly_1_coords_over_time(f+frames_to_see-1,1), fly_1_coords_over_time(f,2)];
-            P2 = [fly_2_coords_over_time(f+frames_to_see-1,1), fly_2_coords_over_time(f,2)];
-
-            v1 = [dx1, dy1];
-            v2 = [dx2, dy2];
-
-            % Determine intersection
-            A = [v1', -v2'];
-            b = P2 - P1;
-            
-            is_intersecting = 0;
-            if rank(A) < 2
-                disp('Lines are parallel or coincident.');
-            else
-                ts = A\b';
-                
-                % t and s are ts(1) and ts(2) respectively
-                if 0 <= ts(1) && ts(1) <= 1 && 0 <= ts(2) && ts(2) <= 1
-                    is_intersecting = 1;
-                    % intersectionPoint = P1 + ts(1) * v1;
-                    % disp(['The lines intersect at point (', num2str(intersectionPoint(1)), ', ', num2str(intersectionPoint(2)), ').']);
-                end
-            end
-
-
-            % --- Check both above conditions---
-            cos_theta_over_time = [cos_theta_over_time cosTheta];
-            is_intersecting_over_time = [is_intersecting_over_time is_intersecting];
-         
-end
 
 % ----- A figure to just visualize
 % frames_to_see_for_coords = 1:15;
