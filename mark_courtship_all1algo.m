@@ -87,18 +87,20 @@ for f = 1:step_size:length(files')-window_length
     
     
     if sum(mark_courtship_zero_dist_max(start_idx:end_idx)) == length(mark_courtship_zero_dist_max(start_idx:end_idx))
-        % disp(['k for testin ' num2str(k)])
-        fly_1_dx = diff(fly_1_coords_over_time(start_idx:end_idx,1));
-        fly_2_dx = diff(fly_2_coords_over_time(start_idx:end_idx,1));
-        fly_1_dy = diff(fly_1_coords_over_time(start_idx:end_idx,2));
-        fly_2_dy = diff(fly_2_coords_over_time(start_idx:end_idx,2));
+        disp(['Removed window_num is ' num2str(window_num)])
+        fly1_start_pt = fly_1_coords_over_time(start_idx, :);
+        fly1_end_pt = fly_1_coords_over_time(end_idx, :);
+        fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);
 
-        if sum(fly_1_dx < 1) == length(fly_1_dx) && sum(fly_2_dx < 1) == length(fly_2_dx) && sum(fly_1_dy < 1) == length(fly_1_dy) && sum(fly_2_dy < 1) == length(fly_2_dy)
-            disp(['window_num is ' num2str(window_num)])
-            disp('))))))))))))))))) REMOVED COURTSHIP ((((((((((((((((((()))))))))))))))))))')
+        fly2_start_pt = fly_2_coords_over_time(start_idx, :);
+        fly2_end_pt = fly_2_coords_over_time(end_idx, :);
+        fly2_dist_travelled = pdist([fly2_start_pt; fly2_end_pt]);
+
+        if fly1_dist_travelled < thresold_pixel_distance &&  fly2_dist_travelled < thresold_pixel_distance
             mark_courtship(start_idx:end_idx) = 0;
             mark_courtship_zero_dist_max(start_idx:end_idx) = 0;
         end
+        
     end
 
 end
