@@ -14,11 +14,49 @@ clc;close all;clear;
 % y1 = 175;
 % x2 = 310;
 % y2 = 179;
+files = dir('all_frames/*.png');
+img = imread(strcat('all_frames/', files(1).name));
+
+% calculate mid point
+% Load the image (replace this with your actual image loading code)
+% Example: img = imread('your_image.png');
+
+% Convert to grayscale if the image is RGB
+if size(img, 3) == 3
+    img = rgb2gray(img);
+end
+
+% Convert to binary image if not already (optional: you might need to adjust the threshold)
+bw_img = imbinarize(img, 0.5);  % 0.5 is the threshold, adjust as necessary
+
+% Get the image size
+[rows, cols] = size(bw_img);
+
+% Find the middle row
+mid_row = round(rows / 2);
+
+% Get the non-zero elements in the middle row
+non_zero_cols = find(bw_img(mid_row, :));
+
+% Check if there are non-zero elements
+if ~isempty(non_zero_cols)
+    % Find left and right midpoints
+    left_midpoint = [mid_row, non_zero_cols(1)];
+    right_midpoint = [mid_row, non_zero_cols(end)];
+else
+    error('No non-zero elements found in the middle row. Adjust the threshold or check the image.');
+end
+
+% Display the results
+disp(['Left midpoint: ', mat2str(left_midpoint)]);
+disp(['Right midpoint: ', mat2str(right_midpoint)]);
+
+x1 = left_midpoint(1); y1 = left_midpoint(2); x2 = right_midpoint(1); y2 = right_midpoint(2);
 
 % SAMPLE D
 % x1 = 5; y1 = 161; x2 = 281; y2 = 161;
 % sample c
-x1 = 13; y1 = 182; x2 = 288; y2 = 182;
+% x1 = 13; y1 = 182; x2 = 288; y2 = 182;
 
 % sample_b
 % x1 = 37; y1 = 185; x2 = 316; y2 = 185;
@@ -52,8 +90,7 @@ is_intersecting_over_time = [];
 all_params;
 
 num_of_flies_over_time = [];
-files = dir('all_frames/*.png');
-img = imread(strcat('all_frames/', files(1).name));
+
 
 frame_zero_counter = 0;
 % Now make a mask out of cirle, basically ones inside circle, zeros outside circle
@@ -89,46 +126,6 @@ for file = files'
     end
     
     
-    % ########################################
-    % This code is to plot the case when detected flies are more than 2
-    % ######################################## 
-    % fly_coords = zeros(2,2);
-    % if length(fly_indices) == 2
-    %     fly_coords(1,:) = stats(fly_indices(1)).Centroid;
-    %     fly_coords(2,:) = stats(fly_indices(2)).Centroid;
-
-    %     dist = pdist(fly_coords);
-    %     disp(dist)
-    %     dist_over_time = [dist_over_time dist];
-    %     % figure,
-    %     % imagesc(maskedFly1);  % Replace 'yourImage' with your image matrix name
-    %     % % Plot centroids
-    %     % hold on;
-    %     % plot(fly_coords(:,1), fly_coords(:,2), 'r*', 'MarkerSize', 10);
-    %     % hold off
-
-    % else
-    %     disp(['Num of flies ' num2str(length(fly_indices))])
-    %     all_fly_coords = zeros(length(fly_indices), 2);
-    %     for f = 1:length(fly_indices)
-    %         all_fly_coords(f,:) = stats(fly_indices(f)).Centroid;
-    %     end
-
-    %     imagesc(maskedFly1);  % Replace 'yourImage' with your image matrix name
-    %     % Plot centroids
-    %     hold on;
-    %     plot(all_fly_coords(:,1), all_fly_coords(:,2), 'r*', 'MarkerSize', 10);
-    %     hold off
-
-    %     pause
-    %     dist_over_time = [dist_over_time 0];
-    %     close all;
-    % end
-
-
-    % if num of flies is 2, then calculate distance between them
-    % if num of flies is 1, then distance is zero
-    % if number of flies is > 2, take the distance that is maximum
     num_of_flies_over_time = [num_of_flies_over_time length(fly_indices)];
     if length(fly_indices) == 2
 
