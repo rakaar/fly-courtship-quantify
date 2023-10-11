@@ -125,7 +125,31 @@ for file = files'
         end
     end
     
-    
+    % if More than 2 flies are detected, choose the ones with biggest area, the smallest may be due to noise
+    if length(fly_indices)  > 2
+        max_area1 = -1;
+        max_area2 = -1;
+        max_area1_ind = 0;
+        max_area2_ind = 0;
+        for f_ind = 1:length(fly_indices)
+            if stats(fly_indices(f_ind)).Area > max_area1
+                % Update max_area2 with old max_area1 before updating max_area1
+                max_area2 = max_area1;
+                max_area2_ind = max_area1_ind;
+
+                % Now update max_area1
+                max_area1 = stats(fly_indices(f_ind)).Area;
+                max_area1_ind = fly_indices(f_ind);
+            elseif stats(fly_indices(f_ind)).Area > max_area2
+                max_area2 = stats(fly_indices(f_ind)).Area;
+                max_area2_ind = fly_indices(f_ind);
+            end
+        end % for
+        
+        fly_indices = [max_area1_ind max_area2_ind];
+    end % if
+    % TODO - Clean code, because now number of flies is atmost 2
+
     num_of_flies_over_time = [num_of_flies_over_time length(fly_indices)];
     if length(fly_indices) == 2
 
