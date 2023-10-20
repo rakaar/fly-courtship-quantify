@@ -7,8 +7,6 @@ numImages = length(imgFiles);
 
 % load data
 mark_courtship = load('mark_courtship.mat').mark_courtship;
-% mark_courtship_dec_distance = load('mark_courtship_dec_distance').mark_courtship_dec_distance;
-% mark_courtship_non_dec_distance = load('mark_courtship_non_dec_distance').mark_courtship_non_dec_distance;
 mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
 
 frameRate = 5; % Frames per second

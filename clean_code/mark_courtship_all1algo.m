@@ -106,8 +106,14 @@ for f = 1:step_size:length(files')-window_length
 end
 
 
+courtship_index = num2str(0.2*sum(mark_courtship)/600);
+courtship_frame_num = num2str(0.2*sum(mark_courtship));
+disp(['frame of courtsip ' courtship_frame_num ' Index = ' courtship_index ])
 
-disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ])
+video_path = load('video_path').video_path;
+[~, video_name, ext] = fileparts(video_path);
+save([video_name '_results'], 'courtship_index', 'courtship_frame_num')
+
 
 figure;
 plot(smooth_dist, '-');    % Plot the smooth line

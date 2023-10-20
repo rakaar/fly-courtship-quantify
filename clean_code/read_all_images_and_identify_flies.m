@@ -11,6 +11,9 @@ else
    disp(['User selected: ', fullpath]);
 end
 
+video_path = fullpath;
+save('video_path', 'video_path')
+
 % ffmpeg command
 input_video_path = fullpath;
 output_frames_path = fullfile(output_folder, 'frame_%04d.png');
