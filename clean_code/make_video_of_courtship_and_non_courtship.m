@@ -1,4 +1,4 @@
-clear;
+
 
 output_folder = load('output_folder.mat').output_folder;
 img_folder = output_folder;
@@ -9,11 +9,15 @@ numImages = length(imgFiles);
 mark_courtship = load('mark_courtship.mat').mark_courtship;
 mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
 
+% video_name
+video_path = load('video_path').video_path;
+[~, video_name, ext] = fileparts(video_path);
+
 frameRate = 5; % Frames per second
 
 % ------- Yes courtship ------
 disp('Creating yes_courtship.avi');
-outputVideoFilename = 'yes_courtship.avi'; % Name of the output video file
+outputVideoFilename = [video_name '_yes_courtship.avi']; % Name of the output video file
 
 % Create a VideoWriter object
 outputVideo = VideoWriter(outputVideoFilename);
@@ -33,7 +37,7 @@ close(outputVideo);
 
 % -----------  No courtship ------------
 disp('Creating no_courtship.avi');
-outputVideoFilename = 'no_courtship.avi'; % Name of the output video file
+outputVideoFilename = [video_name '_no_courtship.avi']; % Name of the output video file
 
 % Create a VideoWriter object
 outputVideo = VideoWriter(outputVideoFilename);
@@ -54,8 +58,8 @@ close(outputVideo);
 
 
 % ----------------- Yes, zero distance max ------------
-disp('Creating yes_zero_max_courtship.avi');
-outputVideoFilename = 'yes_zero_max_courtship.avi'; % Name of the output video file
+disp('Creating yes_only_close_dist_criteria.avi');
+outputVideoFilename = [video_name '_yes_only_close_dist_criteria.avi']; % Name of the output video file
 
 % Create a VideoWriter object
 outputVideo = VideoWriter(outputVideoFilename);

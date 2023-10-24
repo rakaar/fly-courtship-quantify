@@ -1,21 +1,11 @@
-clc;close all;clear;
 
-output_folder = '/home/rka/code/fly_courtship/all_frames';
-save('output_folder', 'output_folder')
+% Save output folder
+output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 
-[filename, pathname] = uigetfile('*.avi', 'Select an AVI video file');
-if isequal(filename, 0) || isequal(pathname, 0)
-   disp('User canceled file selection.');
-else
-   fullpath = fullfile(pathname, filename);
-   disp(['User selected: ', fullpath]);
-end
-
-video_path = fullpath;
-save('video_path', 'video_path')
+% Save video path taken from input_video_path
+video_path = input_video_path; save('video_path', 'video_path');
 
 % ffmpeg command
-input_video_path = fullpath;
 output_frames_path = fullfile(output_folder, 'frame_%04d.png');
 ffmpeg_command_format = 'LD_LIBRARY_PATH="" ffmpeg -i %s %s';
 ffmpeg_command = sprintf(ffmpeg_command_format, input_video_path, output_frames_path);
