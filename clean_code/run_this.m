@@ -24,9 +24,9 @@ num_files = length(avi_files);
 data = cell(num_files, 3); % 3 columns: filename, 0, 0
 
     % Display paths of all .avi files
-    for i = 1:length(avi_files)
-        disp(['Video # ' num2str(i) '/' num2str(length(avi_files))]);
-        input_video_path = fullfile(avi_files(i).folder, avi_files(i).name);
+    for avi_f = 1:length(avi_files)
+        disp(['Video # ' num2str(avi_f) '/' num2str(length(avi_files))]);
+        input_video_path = fullfile(avi_files(avi_f).folder, avi_files(avi_f).name);
         disp(['Input video path: ' input_video_path]);
 
         disp('########### Identify flies and mark their positions###########')
@@ -42,9 +42,9 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         courtship_frame_num = load('courtship_frame_num').courtship_frame_num;
         courtship_index = load('courtship_index').courtship_index;
         
-        data{i, 1} = video_name;
-        data{i, 2} = courtship_frame_num;
-        data{i, 3} = courtship_index;
+        data{avi_f, 1} = video_name;
+        data{avi_f, 2} = courtship_frame_num;
+        data{avi_f, 3} = courtship_index;
         
 
         disp(' ########## Make Video ##########')

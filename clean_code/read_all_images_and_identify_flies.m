@@ -79,6 +79,7 @@ frame_zero_counter = 0;
 circlePixels = (rowsInImage - y_center).^2 + (columnsInImage - x_center).^2 <= radius.^2;
 mask = uint8(circlePixels);
 
+
 % iterate through all png files in "all_frames" folder
 counter = 1;
 for file = files'
