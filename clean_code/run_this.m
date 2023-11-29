@@ -28,7 +28,10 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         disp(['Video # ' num2str(avi_f) '/' num2str(length(avi_files))]);
         input_video_path = fullfile(avi_files(avi_f).folder, avi_files(avi_f).name);
         disp(['Input video path: ' input_video_path]);
-
+        % TODO
+        % 1. keep ffmpeg outside
+        % 2. read_all_images_and_identify_flies is a func which takes "mask" as one of parameter
+        % 3. use circle_identify_flies_in_marked_arena code to detect boundaries 
         disp('########### Identify flies and mark their positions###########')
         read_all_images_and_identify_flies;
 

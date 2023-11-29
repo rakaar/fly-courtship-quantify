@@ -10,7 +10,8 @@ output_frames_path = fullfile(output_folder, 'frame_%04d.png');
 ffmpeg_command_format = 'LD_LIBRARY_PATH="" ffmpeg -i %s %s';
 ffmpeg_command = sprintf(ffmpeg_command_format, input_video_path, output_frames_path);
 
-[status, cmdout] = system(ffmpeg_command);
+% TODO - IMP - REMOVE THIS COMMMENT LATER
+% [status, cmdout] = system(ffmpeg_command);
 if status == 0
     disp('Frames extracted successfully.');
 else
