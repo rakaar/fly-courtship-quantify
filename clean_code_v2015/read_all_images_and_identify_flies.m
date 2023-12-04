@@ -1,30 +1,14 @@
 
-% Save output folder
-output_folder = 'C:\Users\Diginest\Desktop\Output_Frames'; save('output_folder', 'output_folder');
-
-% Save video path taken from input_video_path
-video_path = input_video_path; save('video_path', 'video_path');
-current_dir = pwd;
-ffmpeg_dir = 'E:\General Softwares\FFMPEG_Folder';
-
-% ffmpeg command
-output_frames_path = fullfile(output_folder, 'frame_%04d.png');
-ffmpeg_command_format = 'ffmpeg -i %s %s';
-ffmpeg_command = sprintf(ffmpeg_command_format, input_video_path, output_frames_path);
-cd(ffmpeg_dir)
-[status, cmdout] = system(ffmpeg_command);
-cd(current_dir)
-if status == 0
-    disp('Frames extracted successfully.');
-else
-    disp('Error extracting frames.');
-    disp(cmdout);  % Display the error message
-end
 
 % Convert to grayscale if the image is RGB
-files = dir([output_folder '\*.png']);
+% WINDOWS
+% files = dir([output_folder '\*.png']);
+files = dir([output_folder '/*.png']);
 
-img = imread(strcat(output_folder, '\', files(1).name));
+% WINDOWS
+% img = imread(strcat(output_folder, '\', files(1).name));
+img = imread(strcat(output_folder, '/', files(1).name));
+
 if size(img, 3) == 3
     img = rgb2gray(img);
 end
@@ -88,7 +72,10 @@ for file = files'
 
     disp(['Processing file ' file.name])
     % read image
-    img = imread(strcat(output_folder,'\', file.name));
+    % WINDOWS
+    % img = imread(strcat(output_folder,'\', file.name));
+    img = imread(strcat(output_folder,'/', file.name));
+    
     img1 = squeeze(mean(img,3));
 
     % apply mask

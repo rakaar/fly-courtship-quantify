@@ -8,7 +8,10 @@ fly_2_coords_over_time=fly_2_coords_over_time.fly_2_coords_over_time;
 
 output_folder = load('output_folder');
 output_folder=output_folder.output_folder;
-files = dir([output_folder '\*.png']);
+% WINDOWS
+% files = dir([output_folder '\*.png']);
+files = dir([output_folder '/*.png']);
+
 % Run all_params to get "frames_to_see" and "step_size"
 all_params;
 

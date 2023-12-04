@@ -11,11 +11,11 @@ ffmpeg_command_format = 'LD_LIBRARY_PATH="" ffmpeg -i %s %s';
 ffmpeg_command = sprintf(ffmpeg_command_format, input_video_path, output_frames_path);
 
 % TODO - IMP - REMOVE THIS COMMMENT LATER
-% [status, cmdout] = system(ffmpeg_command);
+[status, cmdout] = system(ffmpeg_command);
 if status == 0
     disp('Frames extracted successfully.');
 else
-    disp('Error extracting frames.');
+    error('Error extracting frames.');
     disp(cmdout);  % Display the error message
 end
 
