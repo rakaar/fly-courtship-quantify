@@ -7,7 +7,11 @@ if ~strcmp(computer, 'GLNXA64')
 else
     output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 end
-circleRadius = 130;
+
+window_length = 5*3;
+window_limit_for_dist_condition = 5*10;
+step_size = 5;
+
 
 disp('########## Select Folder ###########')
 % Prompt user to select a folder
@@ -99,42 +103,18 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         for m = 1:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
-            find_flies(output_folder, indiv_mask, area_indiv_mask);
+            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time] = find_flies(output_folder, indiv_mask, area_indiv_mask);
+            save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
+            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
+            save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');
+            % TODO - to save time, commented
+            make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
         end
-        return
        
-        % TODO
-        % 1. keep ffmpeg outside
-        % 2. read_all_images_and_identify_flies is a func which takes "mask" as one of parameter
-        % 3. use circle_identify_flies_in_marked_arena code to detect boundaries 
-        % 4. Yes or no if circles idenitfied correctly
-        disp('########### Identify flies and mark their positions###########')
-        read_all_images_and_identify_flies;
-
-        disp(' ########### Mark courtship Frames ###########')
-        mark_courtship_all1algo;
-
-        disp('########## Writing to excel sheet #############')
-        video_path = load('video_path');
-        video_path=video_path.video_path;
-
-        [~, video_name, ext] = fileparts(video_path);
-        courtship_frame_num = load('courtship_frame_num');
-        courtship_frame_num=courtship_frame_num.courtship_frame_num;
-        courtship_index = load('courtship_index');
-        courtship_index=courtship_index.courtship_index;
         
-        data{avi_f, 1} = video_name;
-        data{avi_f, 2} = courtship_frame_num;
-        data{avi_f, 3} = courtship_index;
-        
-
-        disp(' ########## Make Video ##########')
-        make_video_of_courtship_and_non_courtship;
-
     end
 
     % WINDOWS
     % xlswrite('results.xlsx', data);
-    writecell(data, 'results.xlsx');
+    % writecell(data, 'results.xlsx');
 

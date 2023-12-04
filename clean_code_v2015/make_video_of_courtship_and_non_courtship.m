@@ -1,5 +1,3 @@
-
-
 output_folder = load('output_folder.mat');
 output_folder=output_folder.output_folder;
 img_folder = output_folder;
