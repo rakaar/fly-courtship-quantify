@@ -20,8 +20,14 @@ function find_flies(output_folder, mask, circle_area)
             img = imread(strcat(output_folder,'/', file.name));
         end
         
-        img1 = rgb2gray(img);
-        imagesc(img1)
+        if length(size(img)) == 3
+            img1 = rgb2gray(img);
+            imagesc(img1)
+        else
+            img1 = img;
+        end
+
+        
         maskedFly1 = double(img1) .* mask;
 
         % threshold for fly color
@@ -44,7 +50,6 @@ function find_flies(output_folder, mask, circle_area)
         
         % get fly indices based on area of blobs
         fly_indices  = [];
-        circle_area = circle_area * 1e3;
         for i = 1:length(stats)
             disp(stats(i).Area)
             if 100*(stats(i).Area/circle_area) > fly_min_area_percent && 100*(stats(i).Area/circle_area) < fly_max_area_percet && mask(round(stats(i).Centroid(2)), round(stats(i).Centroid(1))) == 1
