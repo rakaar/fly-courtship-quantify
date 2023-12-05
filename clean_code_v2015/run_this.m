@@ -100,7 +100,8 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
             return; % Exit the script or function
         end
 
-        for m = 1:4
+        % for m = 1:4
+        for m = 1:1
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time] = find_flies(output_folder, indiv_mask, area_indiv_mask);

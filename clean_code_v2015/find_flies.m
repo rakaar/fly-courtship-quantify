@@ -31,7 +31,6 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
         
         if length(size(img)) == 3
             img1 = rgb2gray(img);
-            imagesc(img1)
         else
             img1 = img;
         end
