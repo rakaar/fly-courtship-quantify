@@ -49,9 +49,10 @@ for f = 1:step_size:length(files')-window_length
     b = P2 - P1;
     
     is_intersecting = 0;
-    if rank(A) < 2
-        disp('Lines are parallel or coincident.');
-    else
+    % if rank(A) < 2
+    %     disp('Lines are parallel or coincident.');
+    % else
+    if rank(A) >= 2
         ts = A\b';
         
         % t and s are ts(1) and ts(2) respectively
@@ -88,7 +89,7 @@ for f = 1:step_size:length(files')-window_length
     
     
     if sum(mark_courtship_zero_dist_max(start_idx:end_idx)) == length(mark_courtship_zero_dist_max(start_idx:end_idx))
-        disp(['Removed window_num is ' num2str(window_num)])
+        % disp(['Removed window_num is ' num2str(window_num)])
         fly1_start_pt = fly_1_coords_over_time(start_idx, :);
         fly1_end_pt = fly_1_coords_over_time(end_idx, :);
         fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);

@@ -1,4 +1,4 @@
-function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time] = find_flies(output_folder, mask, circle_area)
+function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, mask, circle_area)
     fly_min_area_percent = 0.01;
     fly_max_area_percent = 2;
     thresold_for_fly_color = 80;
@@ -7,6 +7,8 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
     fly_2_coords_over_time = [];
     cos_theta_over_time = [];
     is_intersecting_over_time = [];
+    are_flies_present = 1;
+    num_of_frames_with_no_flies = 0;
 
 
     if ~strcmp(computer, 'GLNXA64')
@@ -116,21 +118,32 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
             end
             
             dist = pdist(fly_coords);
-        
             dist_over_time = [dist_over_time dist];
-
+       
         elseif length(fly_indices) == 1
                 dist_over_time = [dist_over_time 0];
                 fly_1_coords_over_time = [fly_1_coords_over_time; stats(fly_indices(1)).Centroid];
                 fly_2_coords_over_time = [fly_2_coords_over_time; stats(fly_indices(1)).Centroid];
+
         else
-            error(['No FLIES detected ' file.name ]) 
+            disp('No flies detected')
+             % Visualize centroids on maskedFly1
+
+             dist_over_time = [dist_over_time dist_over_time(end-1)];
+            fly_1_coords_over_time = [fly_1_coords_over_time; [fly_1_coords_over_time(end-1,1) fly_1_coords_over_time(end-1,2)]];
+            fly_2_coords_over_time = [fly_2_coords_over_time; [fly_2_coords_over_time(end-1,1) fly_2_coords_over_time(end-1,2)]];
+        
+            num_of_frames_with_no_flies = num_of_frames_with_no_flies + 1;
+            if num_of_frames_with_no_flies > 100
+                are_flies_present = 0;
+                break;
+            end
         end % if
 
         counter = counter + 1;
         
         
-    end % file
+    end % for file
     close(progress_bar)
 
 

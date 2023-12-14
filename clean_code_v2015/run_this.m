@@ -65,13 +65,7 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         c3 = load('c3').mat;
         c4 = load('c4').mat;
 
-        % masks
-        c1_new = make_circle_proper(c1);
-        c2_new = make_circle_proper(c2);
-        c3_new = make_circle_proper(c3);
-        c4_new = make_circle_proper(c4);
-
-
+        
 
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
         % masks(1,:,:) = c1_new;
@@ -109,16 +103,21 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
             return; % Exit the script or function
         end
 
-        % for m = 1:4
-        for m = 1:1
+        
+        for m = 1:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
-            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time] = find_flies(output_folder, indiv_mask, area_indiv_mask);
+            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
+            if are_flies_present == 0
+                disp(['No flies detected in Arena number ' num2str(m)])
+                continue
+            end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
+            disp(['Courtship index for Arena number ' num2str(m) ' is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');
             % TODO - to save time, commented
-            make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
+            % make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
         end
        
         
