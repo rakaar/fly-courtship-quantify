@@ -50,8 +50,13 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
 
         % load first image from output_folder
         all_images = dir(fullfile(output_folder, '*.png'));
-        first_img_gray = imread(fullfile(output_folder, all_images(1).name));
+        first_img = imread(fullfile(output_folder, all_images(1).name));
         % convery to gray scale
+        if length(size(first_img)) == 3
+            first_img_gray = rgb2gray(first_img);
+        else
+            first_img_gray = first_img;
+        end
         % first_img_gray = rgb2gray(first_img);
         
         % TODO - for now load circles from SAM
@@ -69,11 +74,15 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
 
 
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
-        masks(1,:,:) = c1_new;
-        masks(2,:,:) = c2_new;
-        masks(3,:,:) = c3_new;
-        masks(4,:,:) = c4_new;
+        % masks(1,:,:) = c1_new;
+        % masks(2,:,:) = c2_new;
+        % masks(3,:,:) = c3_new;
+        % masks(4,:,:) = c4_new;
 
+        masks(1,:,:) = c1;
+        masks(2,:,:) = c2;
+        masks(3,:,:) = c3;
+        masks(4,:,:) = c4;
 
         % TODO - uncomment - testing
         figure;
