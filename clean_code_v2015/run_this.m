@@ -8,7 +8,7 @@ else
     output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 end
 
-window_length = 5*3;
+window_length = 5*1;
 window_limit_for_dist_condition = 5*10;
 step_size = 5;
 
@@ -104,7 +104,7 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         end
 
         
-        for m = 1:4
+        for m = 4:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);

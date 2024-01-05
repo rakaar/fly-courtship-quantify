@@ -101,6 +101,7 @@ for f = 1:step_size:length(files')-window_length
         if fly1_dist_travelled < thresold_pixel_distance &&  fly2_dist_travelled < thresold_pixel_distance
             mark_courtship(start_idx:end_idx) = 0;
             mark_courtship_zero_dist_max(start_idx:end_idx) = 0;
+            disp('Removed because both flies did not move')
         end
         
     end
