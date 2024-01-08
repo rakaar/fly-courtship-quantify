@@ -135,3 +135,19 @@ for f = 1:step_size:length(files')-frames_to_see
     
     
 end
+
+is_intersecting_over_time = load('is_intersecting_over_time').is_intersecting_over_time;
+cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
+window_num = 0;
+for f = 1:step_size:length(files')-frames_to_see
+    
+    window_num = window_num + 1;
+    start_idx = 1 + (window_num-1)*step_size;
+    end_idx = start_idx + frames_to_see - 1;
+
+    if cos_theta_over_time(window_num) > 0 && is_intersecting_over_time(window_num) == 1
+        if sum(mark_courtship(start_idx:end_idx)) ~= length(mark_courtship(start_idx:end_idx))
+            disp(['Window Num ' num2str(window_num)])
+        end
+    end
+end

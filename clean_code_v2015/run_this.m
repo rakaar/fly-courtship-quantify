@@ -8,9 +8,9 @@ else
     output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 end
 
-window_length = 5*1;
-window_limit_for_dist_condition = 5*10;
-step_size = 5;
+window_length = 5*2;
+window_limit_for_dist_condition = 2*window_length;
+step_size = 5*1;
 
 
 disp('########## Select Folder ###########')
@@ -104,18 +104,20 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         end
 
         
-        for m = 4:4
+        for m = 2:2
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
-            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
+            % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
+            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present] = find_flies_dist_based(output_folder, indiv_mask, area_indiv_mask);
+            
             if are_flies_present == 0
                 disp(['No flies detected in Arena number ' num2str(m)])
                 continue
             end
-            save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
-            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
+            save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
+            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
             disp(['Courtship index for Arena number ' num2str(m) ' is ' num2str(courtship_index)])
-            save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');
+            save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             % TODO - to save time, commented
             % make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
         end

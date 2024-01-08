@@ -11,21 +11,27 @@ counter = 0;
 
 % % Run all_params to get "frames_to_see" and "step_size"
 frames_to_see = 5*1;
-window_limit_for_dist_condition = 5*10;
+window_limit_for_dist_condition = 5*15;
 step_size = 5;
 
+thresold_pixel_distance = 50;
 window_num = 0;
 
 % Comment this when not Visualizing any particular type of windows
 windows_with_courtship = load('mark_courtship').mark_courtship;
 mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
 
-for f = 1:step_size:length(files')-frames_to_see
+% for f = 1:step_size:length(files')-frames_to_see
+for f = 1:length(files')-frames_to_see
+
     file = files(f);
 
 
         window_num = window_num + 1;
-        start_idx = 1 + (window_num-1)*step_size;
+        % start_idx = 1 + (window_num-1)*step_size;
+        % end_idx = start_idx + frames_to_see - 1;
+        
+        start_idx = window_num;
         end_idx = start_idx + frames_to_see - 1;
         % visualize only non-courtship windows
         % disp(['Window num ' num2str(window_num) ' window val ' num2str(windows_with_courtship(window_num))])
@@ -33,7 +39,10 @@ for f = 1:step_size:length(files')-frames_to_see
         %     continue
         % end
         
-        if ~(sum(windows_with_courtship(start_idx:end_idx)) > 0)
+        % if ~(sum(windows_with_courtship(start_idx:end_idx)) > 0)
+            % continue
+        % end
+        if (sum(windows_with_courtship(window_num + 1)) == 0)
             continue
         end
 
@@ -109,7 +118,17 @@ for f = 1:step_size:length(files')-frames_to_see
             plot(fly_1_coords_over_time(f,1), fly_1_coords_over_time(f,2), 'bo', 'MarkerSize', 10, 'LineWidth', 2)
             plot(fly_2_coords_over_time(f,1), fly_2_coords_over_time(f,2), 'ro', 'MarkerSize', 10, 'LineWidth', 2)
         hold off
-        title([num2str((f)*0.2) ' TO ' num2str((f+frames_to_see-1)*0.2) ' seconds' ' - cos theta = (' num2str(cosTheta) '), is Intersecting ' num2str(is_intersecting) ' courtship marked = ' num2str(sum(windows_with_courtship(start_idx:end_idx))) ' courtship dec distance = ' num2str(sum(mark_courtship_zero_dist_max(start_idx:end_idx))) ])
+
+        fly1_start_pt = fly_1_coords_over_time(start_idx, :);
+        fly1_end_pt = fly_1_coords_over_time(end_idx, :);
+        fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);
+
+        fly2_start_pt = fly_2_coords_over_time(start_idx, :);
+        fly2_end_pt = fly_2_coords_over_time(end_idx, :);
+        fly2_dist_travelled = pdist([fly2_start_pt; fly2_end_pt]);
+
+        exactly_one_fly_stationary = (fly1_dist_travelled < thresold_pixel_distance) +  (fly2_dist_travelled < thresold_pixel_distance) == 1 ;% exactly one o
+        title([num2str((f)*0.2) ' TO ' num2str((f+frames_to_see-1)*0.2) ' seconds' ' - cos theta = (' num2str(cosTheta) '), is Intersecting ' num2str(is_intersecting) ' courtship marked = ' num2str(sum(windows_with_courtship(start_idx:end_idx))) ' courtship dec distance = ' num2str(sum(mark_courtship_zero_dist_max(start_idx:end_idx))) ',cond=' num2str(exactly_one_fly_stationary)])
 
         subplot(1,2,2)
         % Display images in a loop

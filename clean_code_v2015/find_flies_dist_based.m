@@ -1,12 +1,12 @@
-function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, mask, circle_area)
+function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present] = find_flies_dist_based(output_folder, mask, circle_area)
     fly_min_area_percent = 0.01;
     fly_max_area_percent = 2;
     thresold_for_fly_color = 80;
     dist_over_time = [];
     fly_1_coords_over_time = [];
     fly_2_coords_over_time = [];
-    cos_theta_over_time = [];
-    is_intersecting_over_time = [];
+    
+    
     are_flies_present = 1;
     num_of_frames_with_no_flies = 0;
 
@@ -21,8 +21,20 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
     progress_bar = waitbar(0, 'Starting');
 
     for file = files'
-
-        waitbar(counter/total_num_files, progress_bar, sprintf('Identifying Flies in each frame: %d %%', floor(counter/total_num_files*100)));
+        try
+            % Your original code
+            waitbar(counter/total_num_files, progress_bar, sprintf('Identifying Flies in each frame: %d %%', floor(counter/total_num_files*100)));
+        catch ME
+            % Error handling code
+            fprintf('An error occurred: %s\n', ME.message);
+            fprintf('Current counter value: %d\n', counter);
+            fprintf('Total number of files: %d\n', total_num_files);
+            % Include any other relevant information here
+            % You can also perform other error handling operations here
+        end
+        
+        % waitbar(counter/total_num_files, progress_bar, sprintf('Identifying Flies in each frame: %d %%', floor(counter/total_num_files*100)));
+        
         % read image
         % WINDOWS
         if ~strcmp(computer, 'GLNXA64')
@@ -99,14 +111,7 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
             fly_coords(1,:) = stats(fly_indices(1)).Centroid;
             fly_coords(2,:) = stats(fly_indices(2)).Centroid;
 
-            if counter > 2
-                new1_prev_1_vec = fly_coords(1,:) - fly_1_coords_over_time(counter-1,:);
-                new2_prev_1_vec = fly_coords(2,:) - fly_1_coords_over_time(counter-1,:);
-                
-                old1_vec = fly_1_coords_over_time(counter-1,:) - fly_1_coords_over_time(counter-2,:);
-                
-                
-                if dot(new1_prev_1_vec, old1_vec)*dot(new2_prev_1_vec, old1_vec) == 0
+            if counter > 1
                     % Distance based criteria
                     old_fly_1_coords = fly_1_coords_over_time(counter-1,:);
                     if pdist([fly_coords(1,:); old_fly_1_coords]) < pdist([fly_coords(2,:); old_fly_1_coords])
@@ -116,33 +121,10 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
                         fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(2,:)];
                         fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(1,:)];
                     end
-                    
-                else
-                    if dot(new1_prev_1_vec, old1_vec) > dot(new2_prev_1_vec, old1_vec)
-                        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
-                        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
-                    else
-                        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(2,:)];
-                        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(1,:)];
-                    end
-                end
                 
-            else % if not is <= 2
-                if counter  == 2
-                    % Distance based criteria
-                    old_fly_1_coords = fly_1_coords_over_time(counter-1,:);
-                    if pdist([fly_coords(1,:); old_fly_1_coords]) < pdist([fly_coords(2,:); old_fly_1_coords])
-                        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
-                        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
-                    else
-                        fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(2,:)];
-                        fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(1,:)];
-                    end
-                else
+            else
                     fly_1_coords_over_time = [fly_1_coords_over_time; fly_coords(1,:)];
                     fly_2_coords_over_time = [fly_2_coords_over_time; fly_coords(2,:)];
-                end
-                
             end
             
             dist = pdist(fly_coords);
@@ -157,12 +139,25 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_th
             disp('No flies detected')
              % Visualize centroids on maskedFly1
 
-             dist_over_time = [dist_over_time dist_over_time(end-1)];
-            fly_1_coords_over_time = [fly_1_coords_over_time; [fly_1_coords_over_time(end-1,1) fly_1_coords_over_time(end-1,2)]];
-            fly_2_coords_over_time = [fly_2_coords_over_time; [fly_2_coords_over_time(end-1,1) fly_2_coords_over_time(end-1,2)]];
+             if length(dist_over_time) > 1
+                dist_over_time = [dist_over_time dist_over_time(end-1)];
+            else
+                dist_over_time = [dist_over_time nan];
+             end
+               
+              
+            if size(fly_1_coords_over_time,1) > 1
+                fly_1_coords_over_time = [fly_1_coords_over_time; [fly_1_coords_over_time(end-1,1) fly_1_coords_over_time(end-1,2)]];
+                fly_2_coords_over_time = [fly_2_coords_over_time; [fly_2_coords_over_time(end-1,1) fly_2_coords_over_time(end-1,2)]];
+            else
+                fly_1_coords_over_time = [fly_1_coords_over_time; [nan nan]];
+                fly_2_coords_over_time = [fly_2_coords_over_time; [nan nan]];
+            end
+             
+            
         
             num_of_frames_with_no_flies = num_of_frames_with_no_flies + 1;
-            if num_of_frames_with_no_flies > 100
+            if num_of_frames_with_no_flies > 50
                 are_flies_present = 0;
                 break;
             end
