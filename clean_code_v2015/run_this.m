@@ -49,7 +49,6 @@ data_row_index = 1;
         % video_to_frames(video_path, output_folder)
         
         
-
         % load first image from output_folder
         all_images = dir(fullfile(output_folder, '*.png'));
         first_img = imread(fullfile(output_folder, all_images(1).name));

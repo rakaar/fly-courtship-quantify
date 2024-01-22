@@ -139,8 +139,8 @@ end
 
 close(progress_bar1)
 
-courtship_index = num2str(0.2*sum(mark_courtship)/600);
-courtship_frame_num = num2str(0.2*sum(mark_courtship));
+courtship_index = num2str(sum(mark_courtship)/length(mark_courtship));
+courtship_frame_num = num2str(sum(mark_courtship));
 % disp(['frame of courtsip ' courtship_frame_num ' Index = ' courtship_index ])
 
 end
