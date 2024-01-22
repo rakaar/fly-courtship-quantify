@@ -11,7 +11,7 @@ end
 window_length = 5*2;
 window_limit_for_dist_condition = 2*window_length;
 step_size = 5*1;
-
+tolerance_limit_for_num_frames_with_no_flies = 50;
 
 disp('########## Select Folder ###########')
 % Prompt user to select a folder
@@ -34,8 +34,10 @@ end
 
 
 num_files = length(avi_files);
-data = cell(num_files, 3); % 3 columns: filename, 0, 0
-
+% data = cell(num_files, 3); % 3 columns: filename, 0, 0
+% Initialize a completely empty cell array
+data = cell(0, 4); % video name, arena id, courtship index, num of frames with no flies
+data_row_index = 1;
     % Display paths of all .avi files
     for avi_f = 1:length(avi_files)
         disp(['Video # ' num2str(avi_f) '/' num2str(length(avi_files))]);
@@ -109,11 +111,11 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         end
 
         
-        for m = 2:2
+        for m = 1:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
-            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present] = find_flies_dist_based(output_folder, indiv_mask, area_indiv_mask);
+            [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present, num_of_frames_with_no_flies] = find_flies_dist_based(output_folder, indiv_mask, area_indiv_mask, tolerance_limit_for_num_frames_with_no_flies);
             
             if are_flies_present == 0
                 disp(['No flies detected in Arena number ' num2str(m)])
@@ -125,10 +127,28 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             % TODO - to save time, commented
             % make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
+
+            [~, video_name, ~] = fileparts(video_path);
+            arena_name = circle_num_to_arena_id_map(m);
+
+            % Populate the cell array
+            data{data_row_index, 1} = video_name;
+            data{data_row_index, 2} = arena_name;
+            data{data_row_index, 3} = courtship_index;
+            data{data_row_index, 4} = num_of_frames_with_no_flies;
+
+            data_row_index = data_row_index + 1;
         end
        
         
     end
+
+    % Convert the cell array to a table
+    dataTable = cell2table(data, 'VariableNames', {'VideoName', 'ArenaName', 'CourtshipIndex', 'NumOfFramesWithNoFlies'});
+
+    % Write the table to an Excel file
+    filename = 'output.xlsx'; % Specify your Excel file name
+    writetable(dataTable, filename);
 
     % WINDOWS
     % xlswrite('results.xlsx', data);

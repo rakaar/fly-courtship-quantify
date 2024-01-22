@@ -1,4 +1,4 @@
-function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present] = find_flies_dist_based(output_folder, mask, circle_area)
+function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present, num_of_frames_with_no_flies] = find_flies_dist_based(output_folder, mask, circle_area, tolerance_limit_for_num_frames_with_no_flies)
     fly_min_area_percent = 0.01;
     fly_max_area_percent = 2;
     thresold_for_fly_color = 80;
@@ -157,7 +157,7 @@ function [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_fl
             
         
             num_of_frames_with_no_flies = num_of_frames_with_no_flies + 1;
-            if num_of_frames_with_no_flies > 50
+            if num_of_frames_with_no_flies > tolerance_limit_for_num_frames_with_no_flies
                 are_flies_present = 0;
                 break;
             end
