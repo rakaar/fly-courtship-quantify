@@ -78,13 +78,18 @@ data = cell(num_files, 3); % 3 columns: filename, 0, 0
         masks(3,:,:) = c3;
         masks(4,:,:) = c4;
 
+
+        % get mappings from circle Ci to Arena identity(A,B,C,D)
+        
+        circle_num_to_arena_id_map = get_circle_num_to_arena_id_map(masks);
+
         % TODO - uncomment - testing
         figure;
         sgtitle('If you want to continue with these identified arenas, type "yes"');
         for m = 1:4
             subplot(2,2,m)
             imagesc(squeeze(masks(m,:,:)).*double(first_img_gray))
-            title(num2str(m))
+            title([num2str(m) ' Arena id = ' circle_num_to_arena_id_map(m)])
         end
         
         

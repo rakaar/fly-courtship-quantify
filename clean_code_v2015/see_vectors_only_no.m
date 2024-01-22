@@ -136,6 +136,8 @@ for f = 1:step_size:length(files')-frames_to_see
     
 end
 
+return
+mark_courtship = load('mark_courtship').mark_courtship;
 is_intersecting_over_time = load('is_intersecting_over_time').is_intersecting_over_time;
 cos_theta_over_time = load('cos_theta_over_time').cos_theta_over_time;
 window_num = 0;
