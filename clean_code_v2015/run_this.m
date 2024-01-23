@@ -1,42 +1,42 @@
 clear;close all;clc;
 
-% --- Params ---
-% WINDOWS
+% ####  Params  ####
+% Algorithm parameters
+window_length = 5*2;
+window_limit_for_dist_condition = 2*window_length;
+step_size = 5*1;
+tolerance_limit_for_num_frames_with_no_flies = 50;
+
+% SAM model weights path
+if ~strcmp(computer, 'GLNXA64')
+    CHECKPOINT_PATH = '/home/rka/code/sam_try\sam_vit_b_01ec64.pth';
+else
+    CHECKPOINT_PATH = '/home/rka/code/sam_try/sam_vit_b_01ec64.pth';
+end
+
+% Output folder for frames generated using ffmpeg
 if ~strcmp(computer, 'GLNXA64')
     output_folder = 'C:\Users\Diginest\Desktop\Output_Frames'; save('output_folder', 'output_folder');
 else
     output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 end
 
-window_length = 5*2;
-window_limit_for_dist_condition = 2*window_length;
-step_size = 5*1;
-tolerance_limit_for_num_frames_with_no_flies = 50;
-
 disp('########## Select Folder ###########')
-% Prompt user to select a folder
 folder_path = uigetdir;
-
-% Check if the user pressed 'Cancel'
 if folder_path == 0
     disp('User pressed cancel.');
     return
 end
 
-% Get a list of all .avi files in the selected folder
 avi_files = dir(fullfile(folder_path, '*.avi'));
-
-% Check if there are any .avi files in the folder
 if isempty(avi_files)
     disp('No .avi files found in the selected folder.');
     return
 end
-
-
 num_files = length(avi_files);
-% data = cell(num_files, 3); % 3 columns: filename, 0, 0
-% Initialize a completely empty cell array
-data = cell(0, 4); % video name, arena id, courtship index, num of frames with no flies
+
+% ####  Data  ####
+data = cell(0, 4); % 1-video name, 2-arena id, 3-courtship index, 4-num of frames with no flies
 data_row_index = 1;
     % Display paths of all .avi files
     for avi_f = 1:length(avi_files)
@@ -44,44 +44,58 @@ data_row_index = 1;
         video_path = fullfile(folder_path, avi_files(avi_f).name);
         disp(['Input video path: ' video_path]);
         
+                
         % convert video at 'video_path' to frames and dump in 'output_folder'
-        % TODO = ONLY 4 QUICK TESTING
-        % video_to_frames(video_path, output_folder)
+        video_to_frames(video_path, output_folder)
         
         
         % load first image from output_folder
         all_images = dir(fullfile(output_folder, '*.png'));
         first_img = imread(fullfile(output_folder, all_images(1).name));
+
         % convery to gray scale
         if length(size(first_img)) == 3
             first_img_gray = rgb2gray(first_img);
         else
             first_img_gray = first_img;
         end
-        % first_img_gray = rgb2gray(first_img);
         
-        % TODO - for now load circles from SAM
-        c1 = load('c1').mat;
-        c2 = load('c2').mat;
-        c3 = load('c3').mat;
-        c4 = load('c4').mat;
+        
+        % remove c*.mat files to avoid confusion
+        matFiles = dir('c*.mat');
+        for k = 1:length(matFiles)
+            delete(matFiles(k).name);
+        end
+
+        % Use SAM to mark arenas
+        disp('Running SAM model to segment areas. This may take a few minutes...')
+        IMAGE_PATH_FOR_SAM = fullfile(output_folder, all_images(1).name);  % Set your image path
+        commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
+        [status, cmdout] = system(commandStr);
+
+        if status == 0
+            disp('Python script executed successfully');
+            disp('Output:');
+            disp(cmdout);
+        else
+            disp('Python script failed to run');
+            disp('Error message:');
+            disp(cmdout);
+        end
+
+
+        % find the ones that are Arenas
+        find_arenas_from_SAM_segments;
 
         
-
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
-        % masks(1,:,:) = c1_new;
-        % masks(2,:,:) = c2_new;
-        % masks(3,:,:) = c3_new;
-        % masks(4,:,:) = c4_new;
-
-        masks(1,:,:) = c1;
-        masks(2,:,:) = c2;
-        masks(3,:,:) = c3;
-        masks(4,:,:) = c4;
+        masks(1,:,:) = load('ARENA1').mat;
+        masks(2,:,:) = load('ARENA2').mat;
+        masks(3,:,:) = load('ARENA3').mat;
+        masks(4,:,:) = load('ARENA4').mat;
 
 
         % get mappings from circle Ci to Arena identity(A,B,C,D)
-        
         circle_num_to_arena_id_map = get_circle_num_to_arena_id_map(masks);
 
         % TODO - uncomment - testing
@@ -124,6 +138,7 @@ data_row_index = 1;
             [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
             disp(['Courtship index for Arena number ' num2str(m) ' is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
+            
             % TODO - to save time, commented
             % make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
 
@@ -153,3 +168,9 @@ data_row_index = 1;
     % xlswrite('results.xlsx', data);
     % writecell(data, 'results.xlsx');
 
+% --- Remove all .mat files ---
+matFiles = dir('*.mat');
+
+for k = 1:length(matFiles)
+    delete(matFiles(k).name);
+end
