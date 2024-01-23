@@ -46,6 +46,7 @@ data_row_index = 1;
         
                 
         % convert video at 'video_path' to frames and dump in 'output_folder'
+        disp('FFMPEG: Converting video to frames. This may take few seconds...')
         video_to_frames(video_path, output_folder)
         
         
@@ -119,8 +120,8 @@ data_row_index = 1;
             disp('Proceeding with the program...');
             close all;
         else
-            disp('Aborting the program.');
-            return; % Exit the script or function
+            disp('Skipping this video. Proceeding with next video...');
+            continue; % Exit the script or function
         end
 
         
@@ -136,7 +137,7 @@ data_row_index = 1;
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
             [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
-            disp(['Courtship index for Arena number ' num2str(m) ' is ' num2str(courtship_index)])
+            disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
             % TODO - to save time, commented

@@ -13,7 +13,7 @@ function arena_masks = arenas_among_segments_algo(sorted_all_segments_struct)
                     radius_j = sorted_all_segments_struct(j).best_fit_circle_radius;
                     if radius_j > 0.9*radius_i && radius_j < 1.1*radius_i
                         % print radius and correlation of j
-                        disp(['j = ' num2str(j)  ,' radius: ', num2str(radius_j), ' correlation: ', num2str(sorted_all_segments_struct(j).best_fit_circle_correlation)]);
+                        % disp(['j = ' num2str(j)  ,' radius: ', num2str(radius_j), ' correlation: ', num2str(sorted_all_segments_struct(j).best_fit_circle_correlation)]);
                         matched_arena_segment_indices = [matched_arena_segment_indices, j];
                     end % if
                 end % if
