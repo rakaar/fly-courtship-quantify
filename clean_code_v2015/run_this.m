@@ -2,17 +2,36 @@ clear;close all;clc;
 
 % ####  Params  ####
 % Algorithm parameters
-window_length = 5*2;
-window_limit_for_dist_condition = 2*window_length;
-step_size = 5*1;
-tolerance_limit_for_num_frames_with_no_flies = 50;
+defaultWindowLength = '10';
+defaultWindowLimitForDistCondition = '20';
+defaultStepSize = '5';
+defaultToleranceLimitForNumFramesWithNoFlies = '50';
 
-% SAM model weights path
-if ~strcmp(computer, 'GLNXA64')
-    CHECKPOINT_PATH = '/home/rka/code/sam_try\sam_vit_b_01ec64.pth';
-else
-    CHECKPOINT_PATH = '/home/rka/code/sam_try/sam_vit_b_01ec64.pth';
+% Prompt for parameters
+prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):'};
+dlgtitle = 'Input Parameters';
+dims = [1 35];
+definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies};
+
+answer = inputdlg(prompt, dlgtitle, dims, definput);
+
+% Check if the user pressed cancel
+if isempty(answer)
+    disp('User cancelled the operation.');
+    return;
 end
+
+% Extract values from dialog box
+window_length = str2double(answer{1});
+window_limit_for_dist_condition = str2double(answer{2});
+step_size = str2double(answer{3});
+tolerance_limit_for_num_frames_with_no_flies = str2double(answer{4});
+
+% Checkbox for asking if videos are needed
+video_choice = questdlg('Do you want to process videos?', ...
+    'Video Processing Selection', ...
+    'YES', 'NO', 'NO');
+
 
 % Output folder for frames generated using ffmpeg
 if ~strcmp(computer, 'GLNXA64')
@@ -21,13 +40,23 @@ else
     output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
 end
 
-disp('########## Select Folder ###########')
-folder_path = uigetdir;
+
+% SAM model weights path
+if ~strcmp(computer, 'GLNXA64')
+    CHECKPOINT_PATH = '/home/rka/code/sam_try\sam_vit_b_01ec64.pth';
+else
+    CHECKPOINT_PATH = '/home/rka/code/sam_try/sam_vit_b_01ec64.pth';
+end
+
+
+disp('########## Select Folder with Fly videos ###########')
+folder_path = uigetdir([], 'Select Folder with Courtship Videos');
 if folder_path == 0
     disp('User pressed cancel.');
     return
 end
 
+% ####  Checking if there are .avi files  ####
 avi_files = dir(fullfile(folder_path, '*.avi'));
 if isempty(avi_files)
     disp('No .avi files found in the selected folder.');
@@ -140,9 +169,10 @@ data_row_index = 1;
             disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
-            % TODO - to save time, commented
-            % make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
-
+            if strcmp(video_choice, 'YES')
+                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
+            end
+            
             [~, video_name, ~] = fileparts(video_path);
             arena_name = circle_num_to_arena_id_map(m);
 
