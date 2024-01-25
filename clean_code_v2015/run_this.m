@@ -1,16 +1,18 @@
 clear;close all;clc;
 
 % ####  Params  ####
+PARAMS;
+
 % Algorithm parameters
-defaultWindowLength = '10';
-defaultWindowLimitForDistCondition = '20';
-defaultStepSize = '5';
-defaultToleranceLimitForNumFramesWithNoFlies = '50';
+defaultWindowLength = num2str(CONSTANTS.defaultWindowLength);
+defaultWindowLimitForDistCondition = num2str(CONSTANTS.defaultWindowLimitForDistCondition);
+defaultStepSize = num2str(CONSTANTS.defaultStepSize);
+defaultToleranceLimitForNumFramesWithNoFlies = num2str(CONSTANTS.defaultToleranceLimitForNumFramesWithNoFlies);
 
 % Prompt for parameters
 prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):'};
-dlgtitle = 'Input Parameters';
-dims = [1 35];
+dlgtitle = 'Algorithm Parameters';
+dims = CONSTANTS.GUI_dims;
 definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies};
 
 answer = inputdlg(prompt, dlgtitle, dims, definput);
@@ -35,17 +37,17 @@ video_choice = questdlg('Do you want to process videos?', ...
 
 % Output folder for frames generated using ffmpeg
 if ~strcmp(computer, 'GLNXA64')
-    output_folder = 'C:\Users\Diginest\Desktop\Output_Frames'; save('output_folder', 'output_folder');
+    output_folder = CONSTANTS.windows_output_folder_path; save('output_folder', 'output_folder');
 else
-    output_folder = '/home/rka/code/fly_courtship/all_frames'; save('output_folder', 'output_folder');
+    output_folder = CONSTANTS.linux_output_folder_path; save('output_folder', 'output_folder');
 end
 
 
 % SAM model weights path
 if ~strcmp(computer, 'GLNXA64')
-    CHECKPOINT_PATH = '/home/rka/code/sam_try\sam_vit_b_01ec64.pth';
+    CHECKPOINT_PATH = CONSTANTS.windows_SAN_model_weights_path;
 else
-    CHECKPOINT_PATH = '/home/rka/code/sam_try/sam_vit_b_01ec64.pth';
+    CHECKPOINT_PATH = CONSTANTS.linux_SAN_model_weights_path;
 end
 
 
