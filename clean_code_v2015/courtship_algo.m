@@ -1,4 +1,4 @@
-function [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size)
+function [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance)
     % WINDOWS
     if strcmp(computer, 'GLNXA64')
         files = dir([output_folder '/*.png']);
@@ -12,8 +12,6 @@ cos_theta_over_time = [];
 mark_courtship = zeros(length(dist_over_time),1);
 mark_courtship_zero_dist_max = zeros(length(dist_over_time),1);
 
-thresold_pixel_distance = 50;
-stationary_pixel_distance = 10;
 window_num = 0;
 total_num_windows = length(1:step_size:length(files')-window_length);
 

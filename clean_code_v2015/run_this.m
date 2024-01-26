@@ -8,14 +8,15 @@ defaultWindowLength = num2str(CONSTANTS.defaultWindowLength);
 defaultWindowLimitForDistCondition = num2str(CONSTANTS.defaultWindowLimitForDistCondition);
 defaultStepSize = num2str(CONSTANTS.defaultStepSize);
 defaultToleranceLimitForNumFramesWithNoFlies = num2str(CONSTANTS.defaultToleranceLimitForNumFramesWithNoFlies);
+default_thresold_pixel_distance = num2str(CONSTANTS.default_thresold_pixel_distance);
+default_stationary_pixel_distance = num2str(CONSTANTS.default_stationary_pixel_distance);
 
 % Prompt for parameters
-prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):'};
+prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):', 'Threshold Pixel Distance:', 'Stationary Pixel Distance:'};
 dlgtitle = 'Algorithm Parameters';
-dims = CONSTANTS.GUI_dims;
-definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies};
+definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies, default_thresold_pixel_distance, default_stationary_pixel_distance};
 
-answer = inputdlg(prompt, dlgtitle, dims, definput);
+answer = inputdlg(prompt, dlgtitle, 1,  definput);
 
 % Check if the user pressed cancel
 if isempty(answer)
@@ -28,6 +29,8 @@ window_length = str2double(answer{1});
 window_limit_for_dist_condition = str2double(answer{2});
 step_size = str2double(answer{3});
 tolerance_limit_for_num_frames_with_no_flies = str2double(answer{4});
+thresold_pixel_distance = str2double(answer{5});
+stationary_pixel_distance = str2double(answer{6});
 
 % Checkbox for asking if videos are needed
 video_choice = questdlg('Do you want to process videos?', ...
@@ -174,7 +177,7 @@ data_row_index = 1;
                 continue
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
-            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size);
+            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
             disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
