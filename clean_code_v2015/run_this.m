@@ -165,6 +165,12 @@ data_row_index = 1;
             
             if are_flies_present == 0
                 disp(['No flies detected in Arena number ' num2str(m)])
+                data{data_row_index, 1} = video_name;
+                data{data_row_index, 2} = arena_name;
+                data{data_row_index, 3} = 'NO FLIES';
+                data{data_row_index, 4} = num_of_frames_with_no_flies;
+
+                data_row_index = data_row_index + 1;
                 continue
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
