@@ -18,8 +18,9 @@ for i = 1:numFiles
     
 
     fname = strcat('c', num2str(i), '.mat');
-    seg = load(fname).segment;
-    area = load(fname).area;
+    fname_data = load(fname);
+    seg = fname_data.segment;
+    area = fname_data.area; 
 
     all_segments_struct(i).segment = seg;
     all_segments_struct(i).area = area;

@@ -121,10 +121,11 @@ data_row_index = 1;
 
         
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
-        masks(1,:,:) = load('ARENA1').mat;
-        masks(2,:,:) = load('ARENA2').mat;
-        masks(3,:,:) = load('ARENA3').mat;
-        masks(4,:,:) = load('ARENA4').mat;
+        ARENA1 = load('ARENA1'); ARENA2 = load('ARENA2'); ARENA3 = load('ARENA3'); ARENA4 = load('ARENA4');
+        masks(1,:,:) = ARENA1.mat;
+        masks(2,:,:) = ARENA2.mat;
+        masks(3,:,:) = ARENA3.mat;
+        masks(4,:,:) = ARENA4.mat;
 
 
         % get mappings from circle Ci to Arena identity(A,B,C,D)
@@ -132,7 +133,7 @@ data_row_index = 1;
 
         % TODO - uncomment - testing
         figure;
-        sgtitle('If you want to continue with these identified arenas, type "yes"');
+        annotation('textbox', [0.5, 0.98, 0, 0], 'String', 'If you want to continue with these identified arenas, type "yes"', 'HorizontalAlignment', 'center', 'EdgeColor', 'none');
         for m = 1:4
             subplot(2,2,m)
             imagesc(squeeze(masks(m,:,:)).*double(first_img_gray))
