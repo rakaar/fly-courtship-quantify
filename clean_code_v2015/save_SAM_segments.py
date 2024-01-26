@@ -1,7 +1,7 @@
 # All in one
 import numpy as np
 import cv2
-import torch
+# import torch
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 from skimage.measure import perimeter
 print('1/4 Imports Done')
@@ -10,9 +10,10 @@ print('1/4 Imports Done')
 def call_SAM(CHECKPOINT_PATH, IMAGE_PATH):
     # SAM params
     # CHECKPOINT_PATH='/home/rka/code/sam_try/sam_vit_b_01ec64.pth'
-    DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    # DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     MODEL_TYPE = "vit_b"
-    sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
+    # sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH).to(device=DEVICE)
+    sam = sam_model_registry[MODEL_TYPE](checkpoint=CHECKPOINT_PATH)
     mask_generator = SamAutomaticMaskGenerator(sam)
     print('2/4 SAM params Initialized')
 
