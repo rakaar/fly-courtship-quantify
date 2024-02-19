@@ -81,7 +81,7 @@ data_row_index = 1;
                 
         % convert video at 'video_path' to frames and dump in 'output_folder'
         disp('FFMPEG: Converting video to frames. This may take few seconds...')
-        video_to_frames(video_path, output_folder)
+        video_to_frames(video_path, output_folder) 
         
         
         % load first image from output_folder
@@ -108,6 +108,7 @@ data_row_index = 1;
         commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
         [status, cmdout] = system(commandStr);
 
+        
         if status == 0
             disp('Python script executed successfully');
             disp('Output:');
@@ -182,7 +183,7 @@ data_row_index = 1;
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
             if strcmp(video_choice, 'YES')
-                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m);
+                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m, circle_num_to_arena_id_map);
             end
             
             [~, video_name, ~] = fileparts(video_path);
@@ -212,7 +213,7 @@ data_row_index = 1;
     % writecell(data, 'results.xlsx');
 
 % --- Remove all .mat files ---
-matFiles = dir('*.mat');
+matFiles = dir('*.mat'); 
 
 for k = 1:length(matFiles)
     delete(matFiles(k).name);

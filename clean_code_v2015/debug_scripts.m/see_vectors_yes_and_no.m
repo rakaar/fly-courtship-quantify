@@ -1,12 +1,12 @@
 clear;clc;close all;
 
-dist_over_time = load('dist_over_time').dist_over_time;
-fly_1_coords_over_time = load('fly_1_coords_over_time').fly_1_coords_over_time;
-fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
+dist_over_time = load('../dist_over_time').dist_over_time;
+fly_1_coords_over_time = load('../fly_1_coords_over_time').fly_1_coords_over_time;
+fly_2_coords_over_time = load('../fly_2_coords_over_time').fly_2_coords_over_time;
 
 images_path = '/home/rka/code/fly_courtship/all_frames/';
 
-files = dir('../all_frames/*.png');
+files = dir('../../all_frames/*.png');
 counter = 0;
 
 % % Run all_params to get "frames_to_see" and "step_size"
@@ -14,8 +14,8 @@ all_params;
 window_num = 0;
 
 % Comment this when not Visualizing any particular type of windows
-windows_with_courtship = load('mark_courtship').mark_courtship;
-mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
+windows_with_courtship = load('../mark_courtship').mark_courtship;
+mark_courtship_zero_dist_max = load('../mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
 
 for f = 1:step_size:length(files')-frames_to_see
     file = files(f);
@@ -33,7 +33,7 @@ for f = 1:step_size:length(files')-frames_to_see
 
         disp(['Processing file ' file.name])
         % read image
-        img = imread(strcat('../all_frames/', file.name));
+        img = imread(strcat('../../all_frames/', file.name));
 
         
         

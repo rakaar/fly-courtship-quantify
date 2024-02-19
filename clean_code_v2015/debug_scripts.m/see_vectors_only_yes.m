@@ -1,25 +1,25 @@
-clear;clc;close all;
+close all;
 
-dist_over_time = load('dist_over_time').dist_over_time;
-fly_1_coords_over_time = load('fly_1_coords_over_time').fly_1_coords_over_time;
-fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
+dist_over_time = load('../dist_over_time').dist_over_time;
+fly_1_coords_over_time = load('../fly_1_coords_over_time').fly_1_coords_over_time;
+fly_2_coords_over_time = load('../fly_2_coords_over_time').fly_2_coords_over_time;
 
 images_path = '/home/rka/code/fly_courtship/all_frames/';
 
-files = dir('../all_frames/*.png');
+files = dir('../../all_frames/*.png');
 counter = 0;
 
 % % Run all_params to get "frames_to_see" and "step_size"
-frames_to_see = 5*1;
-window_limit_for_dist_condition = 5*15;
+frames_to_see = 5*5;
+window_limit_for_dist_condition = 5*60;
 step_size = 5;
 
 thresold_pixel_distance = 50;
 window_num = 0;
 
 % Comment this when not Visualizing any particular type of windows
-windows_with_courtship = load('mark_courtship').mark_courtship;
-mark_courtship_zero_dist_max = load('mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
+windows_with_courtship = load('../mark_courtship').mark_courtship;
+mark_courtship_zero_dist_max = load('../mark_courtship_zero_dist_max').mark_courtship_zero_dist_max;
 
 % for f = 1:step_size:length(files')-frames_to_see
 for f = 1:length(files')-frames_to_see
@@ -39,16 +39,18 @@ for f = 1:length(files')-frames_to_see
         %     continue
         % end
         
-        % if ~(sum(windows_with_courtship(start_idx:end_idx)) > 0)
-            % continue
-        % end
-        if (sum(windows_with_courtship(window_num + 1)) == 0)
+        % For NO
+        if (sum(windows_with_courtship(start_idx:end_idx)) > 0)
             continue
         end
+       
+        % if (sum(windows_with_courtship(window_num + 1)) == 0)
+        %     continue
+        % end
 
         disp(['Processing file ' file.name])
         % read image
-        img = imread(strcat('../all_frames/', file.name));
+        img = imread(strcat('../../all_frames/', file.name));
 
         
         

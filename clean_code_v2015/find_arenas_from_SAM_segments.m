@@ -46,7 +46,9 @@ for i = 1:numFiles
     all_segments_struct(i).best_fit_circle = generate_circle(centroidX, centroidY, radius_range(max_idx)+10, size(seg, 1), size(seg, 2));
 
 end
-sorted_all_segments_struct = arrange_masks_area_desc_order(all_segments_struct);  
+% remove overlapping segments
+overlap_removed_all_segments_struct =  remove_overlapping_segments(all_segments_struct);
+sorted_all_segments_struct = arrange_masks_area_desc_order(overlap_removed_all_segments_struct);  
 
 
 disp('find arena masks')
