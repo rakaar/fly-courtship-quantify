@@ -78,10 +78,10 @@ data_row_index = 1;
         video_path = fullfile(folder_path, avi_files(avi_f).name);
         disp(['Input video path: ' video_path]);
         
-                
+        % TODO      
         % convert video at 'video_path' to frames and dump in 'output_folder'
         disp('FFMPEG: Converting video to frames. This may take few seconds...')
-        video_to_frames(video_path, output_folder) 
+        % video_to_frames(video_path, output_folder) 
         
         
         % load first image from output_folder
@@ -102,26 +102,27 @@ data_row_index = 1;
             delete(matFiles(k).name);
         end
 
+        % TODO
         % Use SAM to mark arenas
         disp('Running SAM model to segment areas. This may take a few minutes...')
-        IMAGE_PATH_FOR_SAM = fullfile(output_folder, all_images(1).name);  % Set your image path
-        commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
-        [status, cmdout] = system(commandStr);
+        % IMAGE_PATH_FOR_SAM = fullfile(output_folder, all_images(1).name);  % Set your image path
+        % commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
+        % [status, cmdout] = system(commandStr);
 
-        
-        if status == 0
-            disp('Python script executed successfully');
-            disp('Output:');
-            disp(cmdout);
-        else
-            disp('Python script failed to run');
-            disp('Error message:');
-            disp(cmdout);
-        end
+        % TODO
+        % if status == 0
+        %     disp('Python script executed successfully');
+        %     disp('Output:');
+        %     disp(cmdout);
+        % else
+        %     disp('Python script failed to run');
+        %     disp('Error message:');
+        %     disp(cmdout);
+        % end
 
-
+        % TODO
         % find the ones that are Arenas
-        find_arenas_from_SAM_segments;
+        % find_arenas_from_SAM_segments;
 
         
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
@@ -160,8 +161,8 @@ data_row_index = 1;
             continue; % Exit the script or function
         end
 
-        
-        for m = 1:4
+        % TODO
+        for m = 4:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
@@ -178,7 +179,7 @@ data_row_index = 1;
                 continue
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
-            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
+            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
             disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
@@ -215,6 +216,7 @@ data_row_index = 1;
 % --- Remove all .mat files ---
 matFiles = dir('*.mat'); 
 
-for k = 1:length(matFiles)
-    delete(matFiles(k).name);
-end
+% TODO
+% for k = 1:length(matFiles)
+%     delete(matFiles(k).name);
+% end

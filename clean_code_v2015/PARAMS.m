@@ -3,7 +3,7 @@ CONSTANTS = struct;
 % ----- ALGO PARAMS -------
 CONSTANTS.defaultWindowLength = 10;
 CONSTANTS.defaultWindowLimitForDistCondition = 20;
-CONSTANTS.defaultStepSize = 5;
+CONSTANTS.defaultStepSize = 2;
 CONSTANTS.defaultToleranceLimitForNumFramesWithNoFlies = 50;
 
 CONSTANTS.default_thresold_pixel_distance = 50;

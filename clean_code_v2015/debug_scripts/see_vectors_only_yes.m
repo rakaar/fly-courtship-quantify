@@ -10,7 +10,7 @@ files = dir('../../all_frames/*.png');
 counter = 0;
 
 % % Run all_params to get "frames_to_see" and "step_size"
-frames_to_see = 5*5;
+frames_to_see = 5*2;
 window_limit_for_dist_condition = 5*60;
 step_size = 5;
 
@@ -44,6 +44,7 @@ for f = 1:length(files')-frames_to_see
             continue
         end
        
+        % FOR YES
         % if (sum(windows_with_courtship(window_num + 1)) == 0)
         %     continue
         % end
