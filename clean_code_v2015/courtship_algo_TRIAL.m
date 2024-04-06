@@ -1,4 +1,4 @@
-function [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance)
+function [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time, stationary_frames] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance)
     % WINDOWS
     if strcmp(computer, 'GLNXA64')
         files = dir([output_folder '/*.png']);
@@ -11,6 +11,7 @@ cos_theta_over_time = [];
 
 mark_courtship = zeros(length(dist_over_time),1);
 mark_courtship_zero_dist_max = zeros(length(dist_over_time),1);
+stationary_frames = zeros(length(dist_over_time),1);
 
 window_num = 0;
 total_num_windows = length(1:step_size:length(files')-window_length);
@@ -72,14 +73,18 @@ for f = 1:step_size:length(files')-window_length
     elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) == length(dist_over_time(start_idx:end_idx))
         mark_courtship(start_idx:end_idx) = 1;
         mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
-        % fly1_start_pt = fly_1_coords_over_time(start_idx, :);
-        % fly1_end_pt = fly_1_coords_over_time(end_idx, :);
-        % fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);
+         fly1_start_pt = fly_1_coords_over_time(start_idx, :);
+         fly1_end_pt = fly_1_coords_over_time(end_idx, :);
+         fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);
 
-        % fly2_start_pt = fly_2_coords_over_time(start_idx, :);
-        % fly2_end_pt = fly_2_coords_over_time(end_idx, :);
-        % fly2_dist_travelled = pdist([fly2_start_pt; fly2_end_pt]);
-
+         fly2_start_pt = fly_2_coords_over_time(start_idx, :);
+         fly2_end_pt = fly_2_coords_over_time(end_idx, :);
+         fly2_dist_travelled = pdist([fly2_start_pt; fly2_end_pt]);
+		
+         if (fly1_dist_travelled <=  stationary_pixel_distance) +  (fly2_dist_travelled <=  stationary_pixel_distance) == 2 % exactly one of them is stationary
+			 stationary_frames(start_idx:end_idx) = 1;
+		 end
+		 
         % if (fly1_dist_travelled <=  stationary_pixel_distance) +  (fly2_dist_travelled <=  stationary_pixel_distance) == 1 % exactly one of them is stationary
         %     % disp('At least one fly is stationary')
         %     mark_courtship(start_idx:end_idx) = 0;

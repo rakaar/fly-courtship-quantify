@@ -1,4 +1,4 @@
-function make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, video_id, circle_num_to_arena_id_map)
+function make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, video_id, circle_num_to_arena_id_map, stationary_frames)
     
     img_folder = output_folder;
     if strcmp(computer, 'GLNXA64')
@@ -74,5 +74,24 @@ function make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder
     % Close the video file
     close(outputVideo);
     
+    % -----------  stationary frames ------------
+    disp('Creating stationary.avi');
+    outputVideoFilename = [video_name '_' circle_num_to_arena_id_map(video_id) '_stationary.avi']; % Name of the output video file
+    
+    % Create a VideoWriter object
+    outputVideo = VideoWriter(outputVideoFilename);
+    outputVideo.FrameRate = frameRate;
+    open(outputVideo);
+    
+    for k = 1:numImages
+        if stationary_frames(k) == 1
+            imgFilename = fullfile(img_folder,imgFiles(k).name);
+            img = imread(imgFilename);
+            writeVideo(outputVideo, img);
+        end
+    end
+    
+    % Close the video file
+    close(outputVideo);
     
 end

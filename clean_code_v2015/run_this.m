@@ -162,7 +162,7 @@ data_row_index = 1;
         end
 
         % TODO
-        for m = 4:4
+        for m = 1:1
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
@@ -179,12 +179,12 @@ data_row_index = 1;
                 continue
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
-            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
+            [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time, stationary_frames] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
             disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
             if strcmp(video_choice, 'YES')
-                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m, circle_num_to_arena_id_map);
+                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
             end
             
             [~, video_name, ~] = fileparts(video_path);
