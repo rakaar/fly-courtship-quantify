@@ -71,8 +71,6 @@ for f = 1:step_size:length(files')-window_length
     if cosTheta > 0 && is_intersecting == 1
         mark_courtship(start_idx:end_idx) = 1;
     elseif sum(dist_over_time(start_idx:end_idx) < thresold_pixel_distance) == length(dist_over_time(start_idx:end_idx))
-        mark_courtship(start_idx:end_idx) = 1;
-        mark_courtship_zero_dist_max(start_idx:end_idx) = 1;
          fly1_start_pt = fly_1_coords_over_time(start_idx, :);
          fly1_end_pt = fly_1_coords_over_time(end_idx, :);
          fly1_dist_travelled = pdist([fly1_start_pt; fly1_end_pt]);
@@ -81,7 +79,13 @@ for f = 1:step_size:length(files')-window_length
          fly2_end_pt = fly_2_coords_over_time(end_idx, :);
          fly2_dist_travelled = pdist([fly2_start_pt; fly2_end_pt]);
 		
-         if (fly1_dist_travelled <=  stationary_pixel_distance) +  (fly2_dist_travelled <=  stationary_pixel_distance) == 2 % exactly one of them is stationary
+		 fly1_x_cordinate = fly_1_coords_over_time(start_idx:end_idx,1);
+		 fly2_x_cordinate = fly_2_coords_over_time(start_idx:end_idx,1);
+		 
+		 % if is identified as single fly, then it means copulation attempt is made(hence courtship)
+		 if sum(fly1_x_cordinate == fly2_x_cordinate) == length(start_idx:end_idx)
+			mark_courtship(start_idx:end_idx) = 1;
+		 elseif (fly1_dist_travelled <=  stationary_pixel_distance) +  (fly2_dist_travelled <=  stationary_pixel_distance) == 2 % both of them is stationary
 			 stationary_frames(start_idx:end_idx) = 1;
 		 end
 		 
@@ -100,12 +104,12 @@ end
 
 close(progress_bar)
 
-progress_bar1 = waitbar(0,'Starting courtship algorithm - II...');
+% progress_bar1 = waitbar(0,'Starting courtship algorithm - II...');
 % less than threshold pixels for 15 seconds, then remove courtship
-window_length = window_limit_for_dist_condition; % 15/10 seconds, each second is 5 frames
-window_num = 0;
+% window_length = window_limit_for_dist_condition; % 15/10 seconds, each second is 5 frames
+% window_num = 0;
 
-removal_start_stop_pairs = [];
+% removal_start_stop_pairs = [];
 % for f = 1:step_size:length(files')-window_length
 %     window_num = window_num + 1;
 %     waitbar(window_num/total_num_windows, progress_bar1, sprintf('Remove windows where flies stay still for long: %d %%', floor(window_num/total_num_windows*100)));

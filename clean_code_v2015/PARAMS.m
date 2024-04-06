@@ -9,6 +9,9 @@ CONSTANTS.defaultToleranceLimitForNumFramesWithNoFlies = 50;
 CONSTANTS.default_thresold_pixel_distance = 50;
 CONSTANTS.default_stationary_pixel_distance = 10;
 
+CONSTANTS.default_window_len_for_stationary_parts = 10;
+CONSTANTS.default_range_pixels_for_wing_song = 150;
+
 % ---- GUI params -----
 CONSTANTS.GUI_dims = [1 35];
 

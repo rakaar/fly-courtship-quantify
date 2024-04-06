@@ -10,11 +10,13 @@ defaultStepSize = num2str(CONSTANTS.defaultStepSize);
 defaultToleranceLimitForNumFramesWithNoFlies = num2str(CONSTANTS.defaultToleranceLimitForNumFramesWithNoFlies);
 default_thresold_pixel_distance = num2str(CONSTANTS.default_thresold_pixel_distance);
 default_stationary_pixel_distance = num2str(CONSTANTS.default_stationary_pixel_distance);
+default_window_len_for_stationary_parts = num2str(CONSTANTS.default_window_len_for_stationary_parts);
+default_range_pixels_for_wing_song = num2str(CONSTANTS.default_range_pixels_for_wing_song);
 
 % Prompt for parameters
-prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):', 'Threshold Pixel Distance:', 'Stationary Pixel Distance:'};
+prompt = {'Window Length(in frames):', 'Window Limit for Dist Condition(in frames):', 'Step Size(in frames):', 'Tolerance Limit for Num Frames with No Flies(in frames):', 'Threshold Pixel Distance:', 'Stationary Pixel Distance:', 'Window Length for analysing Stationary Parts: ', 'Min Range of Pixels for wing song detection: '};
 dlgtitle = 'Algorithm Parameters';
-definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies, default_thresold_pixel_distance, default_stationary_pixel_distance};
+definput = {defaultWindowLength, defaultWindowLimitForDistCondition, defaultStepSize, defaultToleranceLimitForNumFramesWithNoFlies, default_thresold_pixel_distance, default_stationary_pixel_distance, default_window_len_for_stationary_parts, default_range_pixels_for_wing_song};
 
 answer = inputdlg(prompt, dlgtitle, 1,  definput);
 
@@ -31,6 +33,8 @@ step_size = str2double(answer{3});
 tolerance_limit_for_num_frames_with_no_flies = str2double(answer{4});
 thresold_pixel_distance = str2double(answer{5});
 stationary_pixel_distance = str2double(answer{6});
+window_len_for_stationary_parts = str2double(answer{7});
+range_pixels_for_wing_song = str2double(answer{8});
 
 % Checkbox for asking if videos are needed
 video_choice = questdlg('Do you want to process videos?', ...
@@ -81,7 +85,7 @@ data_row_index = 1;
         % TODO      
         % convert video at 'video_path' to frames and dump in 'output_folder'
         disp('FFMPEG: Converting video to frames. This may take few seconds...')
-        % video_to_frames(video_path, output_folder) 
+        video_to_frames(video_path, output_folder) 
         
         
         % load first image from output_folder
@@ -105,24 +109,24 @@ data_row_index = 1;
         % TODO
         % Use SAM to mark arenas
         disp('Running SAM model to segment areas. This may take a few minutes...')
-        % IMAGE_PATH_FOR_SAM = fullfile(output_folder, all_images(1).name);  % Set your image path
-        % commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
-        % [status, cmdout] = system(commandStr);
+         IMAGE_PATH_FOR_SAM = fullfile(output_folder, all_images(1).name);  % Set your image path
+         commandStr = sprintf('python3 py_SAM_script.py %s %s', CHECKPOINT_PATH, IMAGE_PATH_FOR_SAM);
+         [status, cmdout] = system(commandStr);
 
         % TODO
-        % if status == 0
-        %     disp('Python script executed successfully');
-        %     disp('Output:');
-        %     disp(cmdout);
-        % else
-        %     disp('Python script failed to run');
-        %     disp('Error message:');
-        %     disp(cmdout);
-        % end
+         if status == 0
+             disp('Python script executed successfully');
+             disp('Output:');
+             disp(cmdout);
+         else
+             disp('Python script failed to run');
+             disp('Error message:');
+             disp(cmdout);
+         end
 
         % TODO
         % find the ones that are Arenas
-        % find_arenas_from_SAM_segments;
+         find_arenas_from_SAM_segments;
 
         
         masks = zeros(4, size(first_img_gray,1), size(first_img_gray,2));
@@ -162,7 +166,7 @@ data_row_index = 1;
         end
 
         % TODO
-        for m = 1:1
+        for m = 1:4
             indiv_mask = squeeze(masks(m,:,:));
             area_indiv_mask = sum(indiv_mask(:));
             % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
@@ -180,11 +184,17 @@ data_row_index = 1;
             end
             save('fly_1_coords_over_time', 'fly_1_coords_over_time'); save('fly_2_coords_over_time', 'fly_2_coords_over_time'); save('dist_over_time', 'dist_over_time'); 
             [courtship_index, courtship_frame_num, mark_courtship, mark_courtship_zero_dist_max, is_intersecting_over_time, cos_theta_over_time, stationary_frames] = courtship_algo_TRIAL(fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, output_folder, window_length, window_limit_for_dist_condition, step_size, thresold_pixel_distance, stationary_pixel_distance);
+
+			% process stationary frames
+			[courtship_stationary_frames, new_courtship_frame_num] = calc_num_of_courtship_frames_from_stationary_frames(stationary_frames, output_folder, indiv_mask, window_len_for_stationary_parts, range_pixels_for_wing_song);
+
+			courtship_index = (str2double(courtship_frame_num) + new_courtship_frame_num)/length(courtship_stationary_frames);
+			
             disp(['Courtship index for Arena number ' num2str(m) '(' circle_num_to_arena_id_map(m) ') is ' num2str(courtship_index)])
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
             if strcmp(video_choice, 'YES')
-                make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
+                make_videos(mark_courtship, stationary_frames, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
             end
             
             [~, video_name, ~] = fileparts(video_path);
@@ -217,6 +227,6 @@ data_row_index = 1;
 matFiles = dir('*.mat'); 
 
 % TODO
-% for k = 1:length(matFiles)
-%     delete(matFiles(k).name);
-% end
+ for k = 1:length(matFiles)
+     delete(matFiles(k).name);
+ end
