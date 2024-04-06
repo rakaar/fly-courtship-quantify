@@ -56,7 +56,7 @@ function make_videos(mark_courtship, mark_courtship_zero_dist_max, output_folder
     
     % ----------------- Yes, zero distance max ------------
     disp('Creating yes_only_close_dist_criteria.avi');
-    outputVideoFilename = [video_name '_' circle_num_to_arena_id_map(video_id) '_yes_only_close_dist_criteria.avi']; % Name of the output video file
+    outputVideoFilename = [video_name '_' circle_num_to_arena_id_map(video_id) '_stationary_courtship.avi']; % Name of the output video file
     
     % Create a VideoWriter object
     outputVideo = VideoWriter(outputVideoFilename);

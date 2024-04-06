@@ -194,7 +194,7 @@ data_row_index = 1;
             save('mark_courtship', 'mark_courtship'); save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max');save('cos_theta_over_time', 'cos_theta_over_time'); save('is_intersecting_over_time', 'is_intersecting_over_time');
             
             if strcmp(video_choice, 'YES')
-                make_videos(mark_courtship, stationary_frames, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
+                make_videos(mark_courtship, courtship_stationary_frames, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
             end
             
             [~, video_name, ~] = fileparts(video_path);
