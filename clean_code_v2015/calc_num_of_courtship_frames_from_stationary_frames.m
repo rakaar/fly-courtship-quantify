@@ -20,7 +20,7 @@ function [courtship_stationary_frames, new_courtship_frame_num] = calc_num_of_co
 		for pic_no = start_frame:end_frame		
 
 				if ~strcmp(computer, 'GLNXA64')
-					filename = sprintf('%s\frame_%04d.png', output_folder, pic_no);
+					filename = sprintf('%s\\frame_%04d.png', output_folder, pic_no);
 				else
 					filename = sprintf('%s/frame_%04d.png', output_folder, pic_no);
 				end
