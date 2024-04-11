@@ -22,6 +22,6 @@ CONSTANTS.windows_output_folder_path = 'C:\Users\Diginest\Desktop\Output_Frames'
 
 % SAN model weights path
 CONSTANTS.linux_SAN_model_weights_path = '/home/rka/code/sam_try/sam_vit_b_01ec64.pth';
-CONSTANTS.windows_SAN_model_weights_path = '/home/rka/code/sam_try\sam_vit_b_01ec64.pth';
+CONSTANTS.windows_SAN_model_weights_path = 'C:\Users\Diginest\Desktop\CS_Software_Resources\sam_vit_b_01ec64.pth';
 
 
