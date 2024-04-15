@@ -6,7 +6,13 @@ function [courtship_stationary_frames, new_courtship_frame_num] = calc_num_of_co
 	min_pixel_value_for_wing = 150; max_pixel_value_for_wing = 180;
 
 	stationary_frames_1 = find(stationary_frames == 1);
+	if isempty(stationary_frames_1)
+		disp('No stationary frames')
+		new_courtship_frame_num = 0;
+		return;
+	end
 	first_1 = stationary_frames_1(1);
+
 
 	window_begin_frames = stationary_frames_1(1:2:end);
 
