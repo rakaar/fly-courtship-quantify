@@ -171,7 +171,10 @@ data_row_index = 1;
             area_indiv_mask = sum(indiv_mask(:));
             % [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, cos_theta_over_time, is_intersecting_over_time, are_flies_present] = find_flies(output_folder, indiv_mask, area_indiv_mask);
             [fly_1_coords_over_time, fly_2_coords_over_time, dist_over_time, are_flies_present, num_of_frames_with_no_flies] = find_flies_dist_based(output_folder, indiv_mask, area_indiv_mask, tolerance_limit_for_num_frames_with_no_flies);
-            
+
+	    [~, video_name, ~] = fileparts(video_path);
+            arena_name = circle_num_to_arena_id_map(m);
+	    
             if are_flies_present == 0
                 disp(['No flies detected in Arena number ' num2str(m)])
                 data{data_row_index, 1} = video_name;
@@ -197,8 +200,6 @@ data_row_index = 1;
                 make_videos(mark_courtship, courtship_stationary_frames, output_folder, video_path, m, circle_num_to_arena_id_map, stationary_frames);
             end
             
-            [~, video_name, ~] = fileparts(video_path);
-            arena_name = circle_num_to_arena_id_map(m);
 
             % Populate the cell array
             data{data_row_index, 1} = video_name;
