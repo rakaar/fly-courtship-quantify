@@ -8,7 +8,7 @@
 2. Install FFMPEG
 3. Install the required python requirements using `pip install -r requirements.txt`
 4. Install [Meta's Segment Anything Model(SAM)](https://segment-anything.com/) as mentioned in its README
-5. Install model checkpoint [ViT-B SAM model](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth)
+5. Download model weights [ViT-B SAM model](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth)
 6. In `PARAMS.m` of this codebase. Change the paths as per your case
 ```
 % ----- Filepaths ------
