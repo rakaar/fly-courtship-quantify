@@ -1,9 +1,16 @@
-close all;clear;
-dist_over_time = load('dist_over_time').dist_over_time;
-fly_1_coords_over_time = load('fly_1_coords_over_time').fly_1_coords_over_time;
-fly_2_coords_over_time = load('fly_2_coords_over_time').fly_2_coords_over_time;
+close all;
+dist_over_time = load('dist_over_time');
+dist_over_time = dist_over_time.dist_over_time;
+fly_1_coords_over_time = load('fly_1_coords_over_time');
+fly_1_coords_over_time=fly_1_coords_over_time.fly_1_coords_over_time;
+fly_2_coords_over_time = load('fly_2_coords_over_time');
+fly_2_coords_over_time=fly_2_coords_over_time.fly_2_coords_over_time;
 
-files = dir('all_frames/*.png');
+output_folder = load('output_folder');
+output_folder=output_folder.output_folder;
+% WINDOWS
+% files = dir([output_folder '\*.png']);
+files = dir([output_folder '/*.png']);
 
 % Run all_params to get "frames_to_see" and "step_size"
 all_params;
@@ -106,18 +113,24 @@ for f = 1:step_size:length(files')-window_length
 end
 
 
+courtship_index = num2str(0.2*sum(mark_courtship)/600);
+courtship_frame_num = num2str(0.2*sum(mark_courtship));
+disp(['frame of courtsip ' courtship_frame_num ' Index = ' courtship_index ])
 
-disp(['frame of courtsip ' num2str(0.2*sum(mark_courtship)) ' Index = ' num2str(0.2*sum(mark_courtship)/600) ])
 
-figure;
-plot(smooth_dist, '-');    % Plot the smooth line
-hold on;                   % Hold the plot to overlay the next elements
-indices = find(mark_courtship == 0);       % Find the indices where mark_courtship is 1
-plot(indices, smooth_dist(indices), '*');  % Mark '*' at those points
-xlabel('X-axis label');
-ylabel('Y-axis label');
-title('Smooth Dist with Courtship Marks');
-legend('Smooth Dist', 'Courtship Marks');
+save('courtship_index', 'courtship_index')
+save('courtship_frame_num', 'courtship_frame_num')
+
+% - NOT so much useful plot
+% figure;
+% plot(smooth_dist, '-');    % Plot the smooth line
+% hold on;                   % Hold the plot to overlay the next elements
+% indices = find(mark_courtship == 0);       % Find the indices where mark_courtship is 1
+% plot(indices, smooth_dist(indices), '*');  % Mark '*' at those points
+% xlabel('X-axis label');
+% ylabel('Y-axis label');
+% title('Smooth Dist with Courtship Marks');
+% legend('Smooth Dist', 'Courtship Marks');
 
 save('mark_courtship', 'mark_courtship')
 save('mark_courtship_zero_dist_max', 'mark_courtship_zero_dist_max')

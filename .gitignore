@@ -1,4 +1,5 @@
 clean_code_v2015/__pycache__/*
+__pycache__/*
 *.avi
 *.png
 *.mat
