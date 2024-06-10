@@ -1,6 +1,7 @@
 # Demo
 
-![Demo GIF](https://giphy.com/embed/SmU6EKQLVUkEgeAMhs)
+![GIF](https://media.giphy.com/media/SmU6EKQLVUkEgeAMhs/giphy.gif)
+
 
 # Usage
 1. Install MATLAB with version >= 2015
