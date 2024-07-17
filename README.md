@@ -1,6 +1,6 @@
 # Demo
 
-![GIF](https://media.giphy.com/media/SmU6EKQLVUkEgeAMhs/giphy.gif)
+[![YouTube](http://i.ytimg.com/vi/ilT3SLXGmPs/hqdefault.jpg)](https://www.youtube.com/watch?v=ilT3SLXGmPs)
 
 
 # Usage
